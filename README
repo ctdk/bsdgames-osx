@@ -1,0 +1,65 @@
+bsdgames-osx: the classic bsdgames ported to Mac OS X
+-----------------------------------------------------
+
+These are the classic bsdgames of old. They've been imported from DragonFly 
+BSD's sources (the games in Dragonfly BSD can be found at 
+http://gitweb.dragonflybsd.org/dragonfly.git/tree/v2.4.0:/games), and only
+modified enough to get them to build on Mac OS X. 
+
+Games included are:
+
+	adventure 
+	arithmetic 
+	atc 
+	backgammon 
+	battlestar 
+	bcd 
+	bs 
+	caesar 
+	canfield 
+	cribbage 
+	dm 
+	factor 
+	fish 
+	fortune 
+	grdc 
+	hack 
+	hangman 
+	hunt 
+	larn 
+	mille 
+	morse 
+	number 
+	phantasia 
+	piano 
+	pig 
+	pom 
+	ppt 
+	primes 
+	quiz 
+	rain 
+	random 
+	robots 
+	rogue 
+	sail 
+	snake 
+	trek 
+	wargames 
+	worm 
+	worms 
+	wump
+
+INSTALLATION
+------------
+
+bsdmake is needed to build the games.
+
+BUGS
+----
+Currently not all of the bsdgames are building on Mac OS X. The games that are
+not building are listed in the file FAILING. As they're fixed, they'll be moved
+out of FAILING.
+
+COPYRIGHT
+---------
+See the COPYRIGHT file & the source for the programs themselves.

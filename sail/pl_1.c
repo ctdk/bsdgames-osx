@@ -118,7 +118,11 @@ choke(void)
 void
 child(void)
 {
+#ifdef __DragonFly__
 	union wait status;
+#else
+	int status;
+#endif
 	int pid;
 
 	signal(SIGCHLD, SIG_IGN);

@@ -6,27 +6,18 @@
 SUBDIR= adventure \
 	arithmetic \
 	atc \
-	backgammon \
 	battlestar \
 	bcd \
 	bs \
 	caesar \
 	canfield \
 	cribbage \
-	dm \
-	factor \
 	fish \
-	fortune \
 	grdc \
-	hack \
 	hangman \
-	hunt \
-	larn \
-	mille \
-	morse \
 	number \
-	phantasia \
 	piano \
+	phantasia \
 	pig \
 	pom \
 	ppt \
@@ -35,8 +26,6 @@ SUBDIR= adventure \
 	rain \
 	random \
 	robots \
-	rogue \
-	sail \
 	snake \
 	trek \
 	wargames \
