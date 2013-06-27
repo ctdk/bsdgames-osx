@@ -79,7 +79,8 @@ out of FAILING.
 cribbage, inexplicably, has some hard coded paths.
 
 morse and piano have been removed because they depend on sound stuff that's not 
-readily available on OS X.
+readily available on OS X. dm was removed because, well, no one would want to
+deal with it anyway.
 
 COPYRIGHT
 ---------
