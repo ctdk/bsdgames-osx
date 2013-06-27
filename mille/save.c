@@ -43,6 +43,7 @@
 
 #include <unctrl.h>
 #include <term.h>
+#include <time.h>
 
 /*
  * @(#)save.c	1.2 (Berkeley) 3/28/83

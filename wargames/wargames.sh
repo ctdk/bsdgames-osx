@@ -29,7 +29,8 @@
 #
 #	@(#)wargames.sh	8.1 (Berkeley) 5/31/93
 #
-echo -n "Would you like to play a game? "
+# sh's built-in echo does not accept -n
+/bin/echo -n "Would you like to play a game? "
 read x
 
 if [ -f /usr/games/$x ] ; then

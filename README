@@ -3,8 +3,15 @@ bsdgames-osx: the classic bsdgames ported to Mac OS X
 
 These are the classic bsdgames of old. They've been imported from DragonFly 
 BSD's sources (the games in Dragonfly BSD can be found at 
-http://gitweb.dragonflybsd.org/dragonfly.git/tree/v2.4.0:/games), and only
-modified enough to get them to build on Mac OS X. 
+http://gitweb.dragonflybsd.org/dragonfly.git/tree/v2.4.0:/games), along with 
+some patches from FreeBSD ports, and only modified enough to get them to build 
+on Mac OS X. 
+
+WARNING: These games could conceivably be a security risk (that's the warning I
+remember seeing with bsdgames in FreeBSD). If this is a concern, don't install
+them. I am also not responsible if they blow up your computer, lure aliens to 
+your house, run up huge credit card bills, eat your dog, or give you a menacing
+side-eye. There's also NO WARRANTY, implied or otherwise.
 
 Games included are:
 
@@ -52,7 +59,16 @@ Games included are:
 INSTALLATION
 ------------
 
-bsdmake is needed to build the games.
+bsdmake is needed to build the games. If needed, you can install it out of 
+homebrew (it doesn't come with recent versions of Xcode).
+
+Installation is a little hairy right now. The basic steps are to run "bsdmake", 
+then "sudo bsdmake install", and it will install in /usr/local (or elsewhere, if
+you edit the Makefile), but "bsdmake install" is having some problems because 
+the default arguments for 'install' on OS X don't create the directories you're
+installing to. Until that's working, if you want to install you'll need to 
+create the directories as "bsdmake install" fails. This is still a work in 
+progress.
 
 BUGS
 ----
@@ -60,6 +76,17 @@ Currently not all of the bsdgames are building on Mac OS X. The games that are
 not building are listed in the file FAILING. As they're fixed, they'll be moved
 out of FAILING.
 
+cribbage, inexplicably, has some hard coded paths.
+
+morse and piano have been removed because they depend on sound stuff that's not 
+readily available on OS X.
+
 COPYRIGHT
 ---------
-See the COPYRIGHT file & the source for the programs themselves.
+See the COPYRIGHT file & the source for the programs themselves. I claim no
+authorship of them.
+
+"AUTHOR"
+--------
+For lack of a better term. The work porting the bsdgames to OS X was done by me,
+Jeremy Bingham <jbingham@gmail.com>.

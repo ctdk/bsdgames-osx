@@ -12,11 +12,12 @@ SUBDIR= adventure \
 	caesar \
 	canfield \
 	cribbage \
+	factor \
 	fish \
 	grdc \
 	hangman \
+	mille \
 	number \
-	piano \
 	phantasia \
 	pig \
 	pom \

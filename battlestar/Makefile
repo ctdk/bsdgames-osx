@@ -12,9 +12,9 @@ LDADD=	-lcurses -ltermcap
 HIDEGAME=hidegame
 
 beforeinstall:
-.if !exists(${DESTDIR}/var/games/battlestar.log)
+.if !exists(${PREFIX}/var/games/battlestar.log)
 	${INSTALL} -o ${BINOWN} -g ${BINGRP} -m 664 /dev/null \
-	    ${DESTDIR}/var/games/battlestar.log
+	    ${PREFIX}/var/games/battlestar.log
 .endif
 
 .include <bsd.prog.mk>

@@ -71,7 +71,7 @@
 static void	pollard_pminus1(BIGNUM *); /* print factors for big numbers */
 #else
 typedef ubig	BIGNUM;
-typedef u_long	BN_ULONG;
+typedef unsigned long	BN_ULONG;
 
 #define BN_CTX			int
 #define BN_CTX_new()		NULL
