@@ -30,6 +30,7 @@ SUBDIR= adventure \
 	random \
 	robots \
 	rogue \
+	sail \
 	snake \
 	trek \
 	wargames \
