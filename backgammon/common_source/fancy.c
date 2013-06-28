@@ -696,18 +696,21 @@ getcaps(const char *s)
 	char ***cap;		/* pointer to cap string */
 	char   *bufp;		/* pointer to cap buffer */
 	char    tentry[1024];	/* temporary uncoded caps buffer */
+	char listr[] = "li";
+	char costr[] = "co";
+	char pcstr[] = "pc";
 
 	tgetent(tentry, s);	/* get uncoded termcap entry */
 
-	LI = tgetnum("li");	/* get number of lines */
+	LI = tgetnum(listr);	/* get number of lines */
 	if (LI == -1)
 		LI = 12;
-	CO = tgetnum("co");	/* get number of columns */
+	CO = tgetnum(costr);	/* get number of columns */
 	if (CO == -1)
 		CO = 65;
 
 	bufp = tbuf;		/* get padding character */
-	tgetstr("pc", &bufp);
+	tgetstr(pcstr, &bufp);
 	if (bufp != tbuf)
 		PC = *tbuf;
 	else

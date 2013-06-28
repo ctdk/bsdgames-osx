@@ -379,7 +379,7 @@ draw_magic_map(void)
 		for (j = 0; j < DCOLS; j++) {
 			s = dungeon[i][j];
 			if (s & mask) {
-				if (((ch = mvinch(i, j)) == ' ') ||
+				if (((ch = (short )mvinch(i, j)) == ' ') ||
 					((ch >= 'A') && (ch <= 'Z')) || (s & (TRAP | HIDDEN))) {
 					och = ch;
 					dungeon[i][j] &= (~HIDDEN);
@@ -519,7 +519,7 @@ edit_opts(void)
 
 	for (i = 0; i < NOPTS+1; i++) {
 		for (j = 0; j < DCOLS; j++) {
-			save[i][j] = mvinch(i, j);
+			save[i][j] = (short )mvinch(i, j);
 		}
 		if (i < NOPTS) {
 			opt_show(i);

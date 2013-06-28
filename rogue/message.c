@@ -326,7 +326,7 @@ save_screen(void)
 		for (i = 0; i < DROWS; i++) {
 			found_non_blank = 0;
 			for (j = (DCOLS - 1); j >= 0; j--) {
-				buf[j] = mvinch(i, j);
+				buf[j] = (short )mvinch(i, j);
 				if (!found_non_blank) {
 					if ((buf[j] != ' ') || (j == 0)) {
 						buf[j + ((j == 0) ? 0 : 1)] = 0;

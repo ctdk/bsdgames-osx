@@ -227,7 +227,7 @@ restmonchn(int fd)
 		if (!mtmp->m_id)
 			mtmp->m_id = flags.ident++;
 		mtmp->data = (struct permonst *)
-		    ((char *)mtmp->data + differ);
+		    ((long *)mtmp->data + differ);
 		if (mtmp->minvent)
 			mtmp->minvent = restobjchn(fd);
 		mtmp2 = mtmp;

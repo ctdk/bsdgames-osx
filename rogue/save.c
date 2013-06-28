@@ -114,7 +114,7 @@ save_into_file(const char *sfile)
 	if (sfile[0] == '~') {
 		if ((hptr = md_getenv("HOME")) != NULL) {
 			len = strlen(hptr) + strlen(sfile);
-			name_buffer = md_malloc(len);
+			name_buffer = (char *) md_malloc(len);
 			if (name_buffer == NULL) {
 				message("out of memory for save file name", 0);
 				sfile = error_file;
@@ -324,7 +324,7 @@ rw_dungeon(FILE *fp, boolean rw)
 		if (rw) {
 			r_write(fp, (char *) dungeon[i], (DCOLS * sizeof(dungeon[0][0])));
 			for (j = 0; j < DCOLS; j++) {
-				buf[j] = mvinch(i, j);
+				buf[j] = (short ) mvinch(i, j);
 			}
 			r_write(fp, buf, DCOLS);
 		} else {

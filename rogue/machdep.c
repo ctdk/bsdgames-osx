@@ -438,10 +438,10 @@ md_getenv(const char *name)
  * when no more memory can be allocated.
  */
 
-char *
+uintptr_t *
 md_malloc(int n)
 {
-	char *t;
+	uintptr_t *t;
 
 	t = malloc(n);
 	return(t);

@@ -517,9 +517,9 @@ leave(int eval, const char *mesg)
 	errno = saved_errno;
 
 	if (errno == 0 && mesg != NULL)
-		errx(eval, mesg);
+		errx(eval, "%s", mesg);
 	else if (mesg != NULL)
-		err(eval, mesg);
+		err(eval, "%s", mesg);
 	exit(eval);
 }
 

@@ -213,7 +213,7 @@ tele_away(object *monster)
 	dungeon[monster->row][monster->col] &= ~MONSTER;
 	monster->row = row; monster->col = col;
 	dungeon[row][col] |= MONSTER;
-	monster->trail_char = mvinch(row, col);
+	monster->trail_char = (short ) mvinch(row, col);
 	if (detect_monster || rogue_can_see(row, col)) {
 		mvaddch(row, col, gmc(monster));
 	}
@@ -298,7 +298,7 @@ bounce(short ball, short dir, short row, short col, short r)
 	orow = row;
 	ocol = col;
 	do {
-		ch = mvinch(orow, ocol);
+		ch = (short ) mvinch(orow, ocol);
 		standout();
 		mvaddch(orow, ocol, ch);
 		get_dir_rc(dir, &orow, &ocol, 1);
@@ -313,7 +313,7 @@ bounce(short ball, short dir, short row, short col, short r)
 	do {
 		orow = row;
 		ocol = col;
-		ch = mvinch(row, col);
+		ch = (short ) mvinch(row, col);
 		mvaddch(row, col, ch);
 		get_dir_rc(dir, &row, &col, 1);
 	} while (!(	(col <= 0) ||

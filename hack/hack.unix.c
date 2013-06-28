@@ -49,7 +49,7 @@ getyear(void)
 }
 
 char *
-getdate(void)
+hack_getdate(void)
 {
 	static char datestr[7];
 	struct tm *lt = getlt();

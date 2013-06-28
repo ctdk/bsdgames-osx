@@ -674,7 +674,7 @@ show_objects(void)
 				monster->trail_char = rc;
 			}
 		}
-		mc = mvinch(row, col);
+		mc = (short )mvinch(row, col);
 		if (((mc < 'A') || (mc > 'Z')) &&
 			((row != rogue.row) || (col != rogue.col))) {
 			mvaddch(row, col, rc);

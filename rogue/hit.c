@@ -338,7 +338,7 @@ fight(boolean to_the_death)
 	row = rogue.row; col = rogue.col;
 	get_dir_rc(d, &row, &col, 0);
 
-	c = mvinch(row, col);
+	c = (short )mvinch(row, col);
 	if (((c < 'A') || (c > 'Z')) ||
 		(!can_move(rogue.row, rogue.col, row, col))) {
 		message("I see no monster there", 0);

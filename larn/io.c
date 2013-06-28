@@ -682,6 +682,15 @@ init_term(void)
 	char  termbuf[1024];
 	char *capptr = cap + 10;
 	char *term;
+	/* Make tgetstr happy - compiler complained about string literals */
+	char cmstr[] = "cm";
+	char cestr[] = "ce";
+	char clstr[] = "cl";
+	char alstr[] = "al";
+	char dlstr[] = "dl";
+	char sostr[] = "so";
+	char sestr[] = "se";
+	char cdstr[] = "cd";
 
 	switch (tgetent(termbuf, term = getenv("TERM"))) {
 	case -1:
@@ -694,16 +703,16 @@ init_term(void)
 		exit(1);
 	}
 
-	CM = tgetstr("cm", &capptr);	/* Cursor motion */
-	CE = tgetstr("ce", &capptr);	/* Clear to eoln */
-	CL = tgetstr("cl", &capptr);	/* Clear screen */
+	CM = tgetstr(cmstr, &capptr);	/* Cursor motion */
+	CE = tgetstr(cestr, &capptr);	/* Clear to eoln */
+	CL = tgetstr(clstr, &capptr);	/* Clear screen */
 
 /* OPTIONAL */
-	AL = tgetstr("al", &capptr);	/* Insert line */
-	DL = tgetstr("dl", &capptr);	/* Delete line */
-	SO = tgetstr("so", &capptr);	/* Begin standout mode */
-	SE = tgetstr("se", &capptr);	/* End standout mode */
-	CD = tgetstr("cd", &capptr);	/* Clear to end of display */
+	AL = tgetstr(alstr, &capptr);	/* Insert line */
+	DL = tgetstr(dlstr, &capptr);	/* Delete line */
+	SO = tgetstr(sostr, &capptr);	/* Begin standout mode */
+	SE = tgetstr(sestr, &capptr);	/* End standout mode */
+	CD = tgetstr(cdstr, &capptr);	/* Clear to end of display */
 
 	if (!CM) {		/* can't find cursor motion entry */
 		write(2, "Sorry, for a ", 13);

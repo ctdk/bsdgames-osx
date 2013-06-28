@@ -103,8 +103,8 @@ setctty(void)
 void
 setftty(void)
 {
-	u_long ef = 0;		/* desired value of flags & ECHO */
-	u_long cf = !(ICANON);	/* desired value of flags & CBREAK */
+	unsigned long ef = 0;		/* desired value of flags & ECHO */
+	unsigned long cf = !(ICANON);	/* desired value of flags & CBREAK */
 	int change = 0;
 
 	flags.cbreak = ON;

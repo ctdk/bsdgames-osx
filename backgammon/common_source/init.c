@@ -37,8 +37,8 @@
  */
 
 /* name of executable object programs */
-const char	EXEC[] = "/usr/games/backgammon";
-const char	TEACH[] = "/usr/games/teachgammon";
+const char	EXEC[] = "/usr/local/bin/backgammon";
+const char	TEACH[] = "/usr/local/bin/teachgammon";
 
 int	pnum	= 2;		/* color of player:
 					-1 = white

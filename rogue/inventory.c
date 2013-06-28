@@ -245,7 +245,7 @@ inventory(const object *pack, unsigned short mask)
 	for (row = 0; ((row < i) && (row < DROWS)); row++) {
 		if (row > 0) {
 			for (j = col; j < DCOLS; j++) {
-				descs[row-1][j-col] = mvinch(row, j);
+				descs[row-1][j-col] = (short )mvinch(row, j);
 			}
 			descs[row-1][j-col] = 0;
 		}
@@ -291,7 +291,7 @@ id_com(void)
 
 				for (i = 0; i < rows; i++) {
 					for (j = 0; j < DCOLS; j++) {
-						save[i][j] = mvinch(i, j);
+						save[i][j] = (short ) mvinch(i, j);
 					}
 				}
 MORE:

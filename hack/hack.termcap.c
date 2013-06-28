@@ -5,6 +5,10 @@
 #include <termcap.h>
 #include "hack.h"
 
+#ifndef __DECONST
+#define __DECONST(type, var)    ((type)(uintptr_t)(const void *)(var))
+#endif
+
 static char tbuf[512];
 static char *HO, *CL, *CE, *tcUP, *CM, *ND, *XD, *tcBC, *SO, *SE, *TI, *TE;
 static char *VS, *VE;

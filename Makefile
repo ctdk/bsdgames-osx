@@ -6,6 +6,7 @@
 SUBDIR= adventure \
 	arithmetic \
 	atc \
+	backgammon \
 	battlestar \
 	bcd \
 	bs \
@@ -15,6 +16,7 @@ SUBDIR= adventure \
 	factor \
 	fish \
 	grdc \
+	hack \
 	hangman \
 	mille \
 	number \
@@ -27,6 +29,7 @@ SUBDIR= adventure \
 	rain \
 	random \
 	robots \
+	rogue \
 	snake \
 	trek \
 	wargames \

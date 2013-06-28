@@ -461,7 +461,7 @@ move_mon_to(object *monster, short row, short col)
 	dungeon[mrow][mcol] &= ~MONSTER;
 	dungeon[row][col] |= MONSTER;
 
-	c = mvinch(mrow, mcol);
+	c = (short )mvinch(mrow, mcol);
 
 	if ((c >= 'A') && (c <= 'Z')) {
 		if (!detect_monster) {
@@ -477,7 +477,7 @@ move_mon_to(object *monster, short row, short col)
 			}
 		}
 	}
-	monster->trail_char = mvinch(row, col);
+	monster->trail_char = (short ) mvinch(row, col);
 	if (!blind && (detect_monster || rogue_can_see(row, col))) {
 		if ((!(monster->m_flags & INVISIBLE) ||
 			(detect_monster || see_invisible || r_see_invisible))) {
@@ -704,7 +704,7 @@ put_m_at(short row, short col, object *monster)
 	monster->row = row;
 	monster->col = col;
 	dungeon[row][col] |= MONSTER;
-	monster->trail_char = mvinch(row, col);
+	monster->trail_char = (short ) mvinch(row, col);
 	add_to_pack(monster, &level_monsters, 0);
 	aim_monster(monster);
 }

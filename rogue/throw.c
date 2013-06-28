@@ -231,7 +231,7 @@ flop_weapon(object *weapon, short row, short col)
 			dungeon[row][col] &= (~MONSTER);
 			dch = get_dungeon_char(row, col);
 			if (mon) {
-				mch = mvinch(row, col);
+				mch = (short )mvinch(row, col);
 				if ((monster = object_at(&level_monsters,
 				    row, col)) != NULL) {
 					monster->trail_char = dch;

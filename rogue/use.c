@@ -493,7 +493,7 @@ hallucinate(void)
 	obj = level_objects.next_object;
 
 	while (obj) {
-		ch = mvinch(obj->row, obj->col);
+		ch = (short )mvinch(obj->row, obj->col);
 		if (((ch < 'A') || (ch > 'Z')) &&
 		    ((obj->row != rogue.row) || (obj->col != rogue.col)))
 		{
@@ -508,7 +508,7 @@ hallucinate(void)
 	monster = level_monsters.next_monster;
 
 	while (monster) {
-		ch = mvinch(monster->row, monster->col);
+		ch = (short )mvinch(monster->row, monster->col);
 		if ((ch >= 'A') && (ch <= 'Z')) {
 			addch(get_rand('A', 'Z'));
 		}

@@ -72,15 +72,16 @@ progress.
 
 BUGS
 ----
-Currently not all of the bsdgames are building on Mac OS X. The games that are
-not building are listed in the file FAILING. As they're fixed, they'll be moved
-out of FAILING.
+Currently the only game failing to build is hunt.
 
 cribbage, inexplicably, has some hard coded paths.
 
 morse and piano have been removed because they depend on sound stuff that's not 
 readily available on OS X. dm was removed because, well, no one would want to
 deal with it anyway.
+
+fortune has been removed because it is readily available elsewhere, and in fact
+has its own homebrew formula. It's best not to duplicate it here.
 
 COPYRIGHT
 ---------

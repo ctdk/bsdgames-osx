@@ -174,7 +174,7 @@ quit(boolean from_intrpt)
 		mc = msg_cleared;
 
 		for (i = 0; i < DCOLS; i++) {
-			buf[i] = mvinch(0, i);
+			buf[i] = (short ) mvinch(0, i);
 		}
 	}
 	check_message();

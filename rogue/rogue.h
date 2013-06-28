@@ -502,7 +502,7 @@ boolean	md_df(const char *);
 const char	*md_gln(void);
 void	md_sleep(int);
 char	*md_getenv(const char *);
-char	*md_malloc(int);
+uintptr_t *md_malloc(int);
 void	md_exit(int);
 void	md_lock(boolean);
 void	md_shell(const char *);
