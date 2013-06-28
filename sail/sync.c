@@ -34,6 +34,7 @@
 #include <sys/errno.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <time.h>
 #include "externs.h"
 
 #define BUFSIZE 4096
