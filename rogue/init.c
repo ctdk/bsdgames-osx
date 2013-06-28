@@ -326,7 +326,7 @@ env_get_value(char **s, char *e, boolean add_blank)
 		}
 	}
 	/* note: edit_opts() in room.c depends on this being the right size */
-	*s = md_malloc(MAX_OPT_LEN + 2);
+	*s = (char *)md_malloc(MAX_OPT_LEN + 2);
 	strncpy(*s, t, i);
 	if (add_blank) {
 		(*s)[i++] = ' ';
@@ -339,7 +339,7 @@ init_str(char **str, const char *dflt)
 {
 	if (!(*str)) {
 		/* note: edit_opts() in room.c depends on this size */
-		*str = md_malloc(MAX_OPT_LEN + 2);
+		*str = (char *) md_malloc(MAX_OPT_LEN + 2);
 		strcpy(*str, dflt);
 	}
 }
