@@ -18,6 +18,7 @@ SUBDIR= adventure \
 	grdc \
 	hack \
 	hangman \
+	larn \
 	mille \
 	number \
 	phantasia \
