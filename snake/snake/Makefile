@@ -11,13 +11,16 @@ HIDEGAME=hidegame
 MLINKS=	snake.6 snscore.6
 
 beforeinstall:
-.if !exists(${DESTDIR}/var/games/snakerawscores)
-	${INSTALL} -o ${BINOWN} -g ${BINGRP} -m 664 /dev/null \
-	    ${DESTDIR}/var/games/snakerawscores
+.if !exists(${RPREFIX}/var/games)
+	mkdir -p ${PREFIX}/var/games
 .endif
-.if !exists(${DESTDIR}/var/games/snake.log)
+.if !exists(${PREFIX}/var/games/snakerawscores)
 	${INSTALL} -o ${BINOWN} -g ${BINGRP} -m 664 /dev/null \
-	    ${DESTDIR}/var/games/snake.log
+	    ${PREFIX}/var/games/snakerawscores
+.endif
+.if !exists(${PREFIX}/var/games/snake.log)
+	${INSTALL} -o ${BINOWN} -g ${BINGRP} -m 664 /dev/null \
+	    ${PREFIX}/var/games/snake.log
 .endif
 
 .include "../../Makefile.inc"

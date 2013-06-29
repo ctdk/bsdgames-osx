@@ -12,9 +12,16 @@ MAN=	cribbage.6
 HIDEGAME=hidegame
 
 beforeinstall:
-.if !exists(${DESTDIR}/var/games/criblog)
+beforeinstall:
+.if !exists(${FILESDIR})
+	mkdir -p ${FILESDIR}
+.endif
+.if !exists(${PREFIX}/var/games)
+	mkdir -p ${PREFIX}/var/games
+.endif
+.if !exists(${PREFIX}/var/games/criblog)
 	${INSTALL} -o ${BINOWN} -g ${BINGRP} -m 664 /dev/null \
-	    ${DESTDIR}/var/games/criblog
+	    ${PREFIX}/var/games/criblog
 .endif
 
 .include <bsd.prog.mk>

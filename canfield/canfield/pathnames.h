@@ -29,5 +29,5 @@
  *	@(#)pathnames.h	8.1 (Berkeley) 5/31/93
  */
 
-#define	_PATH_SCORE	"/var/games/cfscores"
+#define	_PATH_SCORE	"/usr/local/var/games/cfscores"
 

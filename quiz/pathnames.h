@@ -30,4 +30,4 @@
  */
 
 #define	_PATH_PAGER	"/usr/bin/more"
-#define	_PATH_QUIZIDX	"/usr/share/games/quiz.db/index"
+#define	_PATH_QUIZIDX	"/usr/local/share/games/quiz.db/index"

@@ -15,4 +15,9 @@ HIDEGAME=hidegame
 
 .PATH: ${.CURDIR}/games
 
+beforeinstall:
+.if !exists(${FILESDIR})
+	mkdir -p ${FILESDIR}
+.endif
+
 .include <bsd.prog.mk>

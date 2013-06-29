@@ -27,10 +27,13 @@ setup.nx: cross-phantglobs.no setup.no ${LIBM}
 	${NXCC} ${NXCFLAGS} ${NXLDFLAGS} ${.ALLSRC} ${NXLDLIBS} -o ${.TARGET}
 
 beforeinstall:
+.if !exists(${PREFIX}/var/games/phantasia)
+	mkdir -p ${PREFIX}/var/games/phantasia
+.endif
 .for file in ${DATAFILES}
-.if !exists(${DESTDIR}/var/games/phantasia/${file})
+.if !exists(${PREFIX}/var/games/phantasia/${file})
 	${INSTALL} -o ${BINOWN} -g ${BINGRP} -m 660 \
-	    ${file} ${DESTDIR}/var/games/phantasia
+	    ${file} ${PREFIX}/var/games/phantasia
 .endif
 .endfor
 

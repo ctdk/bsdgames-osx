@@ -12,9 +12,12 @@ LDADD=	-lcurses
 HIDEGAME=hidegame
 
 beforeinstall:
-.if !exists(${DESTDIR}/var/games/saillog)
+.if !exists(${PREFIX}/var/games)
+	mkdir -p ${PREFIX}/var/games
+.endif
+.if !exists(${PREFIX}/var/games/saillog)
 	${INSTALL} -o ${BINOWN} -g ${BINGRP} -m 664 /dev/null \
-	    ${DESTDIR}/var/games/saillog
+	    ${PREFIX}/var/games/saillog
 .endif
 
 .include <bsd.prog.mk>

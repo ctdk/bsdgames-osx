@@ -30,4 +30,4 @@
  */
 
 #define	_PATH_PAGER	"/usr/bin/more"
-#define	_PATH_WUMPINFO	"/usr/share/games/wump.info"
+#define	_PATH_WUMPINFO	"/usr/local/share/games/wump.info"

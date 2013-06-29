@@ -76,7 +76,9 @@ BUGS
 ----
 Currently the only game failing to build is hunt.
 
-cribbage, inexplicably, has some hard coded paths.
+Many of these programs have hard coded paths. Currently all of them are now
+changed to sensible defaults under /usr/local, but if you want to install 
+somewhere that *isn't* /usr/local, you'll need to find and update the paths.
 
 morse and piano have been removed because they depend on sound stuff that's not 
 readily available on OS X. dm was removed because, well, no one would want to

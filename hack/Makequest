@@ -6,7 +6,7 @@ TERMLIB = -ltermlib
 
 # make hack
 GAME = quest
-GAMEDIR = /usr/games/lib/questdir
+GAMEDIR = /usr/local/var/games/questdir
 CFLAGS = -g -DQUEST
 HACKCSRC = hack.Decl.c\
 	hack.apply.c hack.bones.c hack.c hack.cmd.c hack.do.c\

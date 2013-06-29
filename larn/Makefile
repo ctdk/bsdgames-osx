@@ -58,13 +58,19 @@ HIDEGAME=hidegame
 .PATH: ${.CURDIR}/datfiles
 
 beforeinstall:
-.if !exists(${DESTDIR}/var/games/larn/lscore12.0)
-	${INSTALL} -o ${BINOWN} -g ${BINGRP} -m 660 /dev/null \
-	    ${DESTDIR}/var/games/larn/lscore12.0
+.if !exists(${FILESDIR})
+	mkdir -p ${FILESDIR}
 .endif
-.if !exists(${DESTDIR}/var/games/larn/llog12.0)
+.if !exists(${PREFIX}/var/games/larn)
+	mkdir -p ${PREFIX}/var/games/larn
+.endif
+.if !exists(${PREFIX}/var/games/larn/lscore12.0)
 	${INSTALL} -o ${BINOWN} -g ${BINGRP} -m 660 /dev/null \
-	    ${DESTDIR}/var/games/larn/llog12.0
+	    ${PREFIX}/var/games/larn/lscore12.0
+.endif
+.if !exists(${PREFIX}/var/games/larn/llog12.0)
+	${INSTALL} -o ${BINOWN} -g ${BINGRP} -m 660 /dev/null \
+	    ${PREFIX}/var/games/larn/llog12.0
 .endif
 
 .include <bsd.prog.mk>

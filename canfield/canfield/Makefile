@@ -10,9 +10,9 @@ HIDEGAME=hidegame
 MLINKS=	canfield.6 cfscores.6
 
 beforeinstall:
-.if !exists(${DESTDIR}/var/games/cfscores)
+.if !exists(${PREFIX}/var/games/cfscores)
 	${INSTALL} -o ${BINOWN} -g ${BINGRP} -m 664 /dev/null \
-	    ${DESTDIR}/var/games/cfscores
+	    ${PREFIX}/var/games/cfscores
 .endif
 
 .include "../../Makefile.inc"

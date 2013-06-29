@@ -2,4 +2,9 @@
 
 SUBDIR= canfield cfscores
 
+beforeinstall:
+.if !exists(${PREFIX}/var/games)
+	mkdir -p ${PREFIX}/var/games
+.endif
+
 .include <bsd.subdir.mk>

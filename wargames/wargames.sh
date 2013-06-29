@@ -33,6 +33,8 @@
 /bin/echo -n "Would you like to play a game? "
 read x
 
+# If installed via Homebrew, this should get changed to the formula's Cellar
+# directory. Spooks me a bit to set it to /usr/local/bin though.
 if [ -f /usr/games/$x ] ; then
 	tput cl
 	exec /usr/games/$x

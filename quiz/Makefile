@@ -12,6 +12,11 @@ FILES=	africa america areas arith asia babies bard chinese collectives \
 FILESDIR=	${SHAREDIR}/games/quiz.db
 HIDEGAME=hidegame
 
+beforeinstall:
+.if !exists(${FILESDIR})
+	mkdir ${FILESDIR}
+.endif
+
 .PATH: ${.CURDIR}/datfiles
 
 .include <bsd.prog.mk>

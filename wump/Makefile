@@ -7,4 +7,9 @@ FILES=	wump.info
 MAN=	wump.6
 HIDEGAME=hidegame
 
+beforeinstall:
+.if !exists(${FILESDIR})
+	mkdir -p ${FILESDIR}
+.endif
+
 .include <bsd.prog.mk>

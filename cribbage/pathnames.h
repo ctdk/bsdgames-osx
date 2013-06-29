@@ -30,5 +30,5 @@
  */
 
 #define	_PATH_INSTR	"/usr/local/share/games/cribbage.instr"
-#define	_PATH_LOG	"/var/games/criblog"
+#define	_PATH_LOG	"/usr/local/var/games/criblog"
 #define	_PATH_MORE	"/usr/bin/more"

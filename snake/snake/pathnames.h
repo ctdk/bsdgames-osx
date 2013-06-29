@@ -29,5 +29,5 @@
  *	@(#)pathnames.h	8.1 (Berkeley) 5/31/93
  */
 
-#define	_PATH_RAWSCORES	"/var/games/snakerawscores"
-#define	_PATH_LOGFILE	"/var/games/snake.log"
+#define	_PATH_RAWSCORES	"/usr/local/var/games/snakerawscores"
+#define	_PATH_LOGFILE	"/usr/local/var/games/snake.log"

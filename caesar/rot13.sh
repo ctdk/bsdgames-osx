@@ -30,4 +30,4 @@
 #	@(#)rot13.sh	8.1 (Berkeley) 5/31/93
 #
 
-exec /usr/games/caesar 13 "$@"
+exec /usr/local/bin/caesar 13 "$@"

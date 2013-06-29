@@ -5,14 +5,12 @@
 PREFIX?=	/usr/local
 BINDIR?=	${PREFIX}/bin
 SHAREDIR=	${PREFIX}/share
-MANDIR=		${PREFIX}/man/man
+MANDIR=		${SHAREDIR}/man/man
 FILESDIR?=	${SHAREDIR}/games
 WARNS?=		6
 
-.if defined(SGIDGAME)
-BINGRP=		games
-BINMODE=	2555
-.endif
+BINGRP?=	staff
+SHAREGRP?= 	staff
 
 # cribbed from DragonflyBSD build system
 

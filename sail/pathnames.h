@@ -29,4 +29,4 @@
  *	@(#)pathnames.h	8.1 (Berkeley) 5/31/93
  */
 
-#define	_PATH_LOGFILE	"/var/games/saillog"
+#define	_PATH_LOGFILE	"/usr/local/var/games/saillog"
