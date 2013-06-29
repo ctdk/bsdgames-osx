@@ -64,13 +64,10 @@ declarations, "CC=clang bsdmake" seems to work wonders. For me it was defaulting
 to clang on Mountain Lion, but to gcc on Lion. Other versions of Mac OS X have
 not been tested.
 
-Installation is a little hairy right now. The basic steps are to run "bsdmake", 
-then "sudo bsdmake install", and it will install in /usr/local (or elsewhere, if
-you edit the Makefile), but "bsdmake install" is having some problems because 
-the default arguments for 'install' on OS X don't create the directories you're
-installing to. Until that's working, if you want to install you'll need to 
-create the directories as "bsdmake install" fails. This is still a work in 
-progress.
+Installation is pretty basic. The steps are to run "bsdmake", then "sudo 
+bsdmake install", and it will install in /usr/local (or elsewhere, if you edit 
+the Makefile). A homebrew formula will be coming soon as well to make it even
+easier.
 
 BUGS
 ----
