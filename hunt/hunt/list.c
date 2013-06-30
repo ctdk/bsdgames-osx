@@ -123,7 +123,7 @@ next_driver_fd(int fd)
 	switch (driver->addr.sa_family) {
 	case AF_INET:
 	case AF_INET6:
-		((struct sockaddr_in *)&driver->addr)->sin_port =
+		((struct sockaddr_in *)(void *)&driver->addr)->sin_port =
 		    htons(driver->response);
 		break;
 	}
@@ -143,7 +143,7 @@ driver_name(struct driver *driver)
 	name = NULL;
 
 	if (driver->addr.sa_family == AF_INET) {
-		sin = (struct sockaddr_in *)&driver->addr;
+		sin = (struct sockaddr_in *)(void *)&driver->addr;
 		hp = gethostbyaddr(&sin->sin_addr, sizeof sin->sin_addr,
 		    AF_INET);
 		if (hp != NULL)
@@ -181,7 +181,7 @@ start_probe(struct sockaddr *addr, u_int16_t req)
 	switch (addr->sa_family) {
 	case AF_INET:
 	case AF_INET6:
-		((struct sockaddr_in *)addr)->sin_port =
+		((struct sockaddr_in *)(void *)addr)->sin_port =
 		    htons(Server_port);
 		break;
 	}
@@ -276,7 +276,7 @@ probe_drivers(u_int16_t req, char *preferred)
 	/* Send a request to every attached broadcast address: */
         ifr = ifc.ifc_req;
         for (i = 0; i < ifc.ifc_len;
-             i += len, ifr = (struct ifreq *)((caddr_t)ifr + len)) {
+             i += len, ifr = (struct ifreq *)(void *)((caddr_t)ifr + len)) {
                 len = sizeof(ifr->ifr_name) +
                       (ifr->ifr_addr.sa_len > sizeof(struct sockaddr) ?
                        ifr->ifr_addr.sa_len : sizeof(struct sockaddr));
@@ -295,13 +295,13 @@ probe_drivers(u_int16_t req, char *preferred)
 				warn("%s: SIOCGIFBRDADDR", ifr->ifr_name);
 				continue;
 			}
-			target = (struct sockaddr_in *)&ifr->ifr_dstaddr;
+			target = (struct sockaddr_in *)(void *)&ifr->ifr_dstaddr;
 		} else if ((ifr->ifr_flags & IFF_POINTOPOINT) != 0) {
 			if (ioctl(fd, SIOCGIFDSTADDR, (caddr_t)ifr) < 0)  {
 				warn("%s: SIOCGIFDSTADDR", ifr->ifr_name);
 				continue;
 			}
-			target = (struct sockaddr_in *)&ifr->ifr_broadaddr;
+			target = (struct sockaddr_in *)(void *)&ifr->ifr_broadaddr;
 		} else
 			continue;
 

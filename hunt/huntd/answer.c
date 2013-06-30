@@ -463,7 +463,7 @@ get_ident(struct sockaddr *sa, int salen __unused, uid_t uid, char *name,
 	u_int32_t	machine;
 
 	if (sa->sa_family == AF_INET)
-		machine = ntohl((u_long)((struct sockaddr_in *)sa)->sin_addr.s_addr);
+		machine = ntohl((u_long)((struct sockaddr_in *)(void *)sa)->sin_addr.s_addr);
 	else
 		machine = 0;
 
@@ -539,7 +539,7 @@ answer_info(FILE *fp)
 		return;
 	fprintf(fp, "\nSpawning connections:\n");
 	for (sp = Spawn; sp; sp = sp->next) {
-		sa = (struct sockaddr_in *)&sp->source;
+		sa = (struct sockaddr_in *)(void *)&sp->source;
 		bf = inet_ntop(AF_INET, &sa->sin_addr, buf, sizeof buf);
 		if (!bf)  {
 			logit(LOG_WARNING, "inet_ntop");
