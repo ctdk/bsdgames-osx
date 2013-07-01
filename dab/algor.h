@@ -77,10 +77,11 @@ class ALGOR : public PLAYER {
 #ifdef notyet
     size_t find_single(void);
 #endif
-
+#if 0
     size_t _edge1;
     size_t _edge2;
     size_t _maxedge;
+#endif
 };
 
 #endif
