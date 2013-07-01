@@ -9,4 +9,9 @@ MAN=dab.6
 SRCS=algor.cc board.cc main.cc human.cc box.cc player.cc gamescreen.cc \
     ttyscrn.cc random.cc
 
+beforeinstall:
+.if !exists(${MANDIR}6)
+	mkdir -p ${MANDIR}6
+.endif
+
 .include <bsd.prog.mk>

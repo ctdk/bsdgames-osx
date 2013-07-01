@@ -31,8 +31,10 @@ Games included are:
 	caesar 
 	canfield 
 	cribbage 
+	dab
 	factor 
 	fish 
+	gomoku
 	grdc 
 	hack 
 	hangman 
@@ -99,7 +101,8 @@ groups you want.
 COPYRIGHT
 ---------
 See the COPYRIGHT file & the source for the programs themselves. I claim no
-authorship of them.
+authorship of them. Most of the games were imported from Dragonfly BSD, but
+gomoku and dab were from NetBSD.
 
 "AUTHOR"
 --------

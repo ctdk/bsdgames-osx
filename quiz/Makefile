@@ -14,7 +14,7 @@ HIDEGAME=hidegame
 
 beforeinstall:
 .if !exists(${FILESDIR})
-	mkdir ${FILESDIR}
+	mkdir -p ${FILESDIR}
 .endif
 .if !exists(${MANDIR}6)
 	mkdir -p ${MANDIR}6

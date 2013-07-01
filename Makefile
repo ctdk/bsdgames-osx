@@ -13,9 +13,11 @@ SUBDIR= adventure \
 	caesar \
 	canfield \
 	cribbage \
+	dab \
 	factor \
 	fish \
 	grdc \
+	gomoku \
 	hack \
 	hangman \
 	hunt \
