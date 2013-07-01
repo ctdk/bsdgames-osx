@@ -155,7 +155,7 @@ again:
 		if (inputfp == NULL && test == 0) {
 			for (;;) {
 				ask("black or white? ");
-				getline(buf, sizeof(buf));
+				g_getline(buf, sizeof(buf));
 				if (buf[0] == 'b' || buf[0] == 'B') {
 					color = BLACK;
 					break;
@@ -172,7 +172,7 @@ again:
 		}
 	} else {
 		setbuf(stdout, 0);
-		getline(buf, sizeof(buf));
+		g_getline(buf, sizeof(buf));
 		if (strcmp(buf, "black") == 0)
 			color = BLACK;
 		else if (strcmp(buf, "white") == 0)
@@ -244,26 +244,26 @@ again:
 		getinput:
 			if (interactive)
 				ask("move? ");
-			if (!getline(buf, sizeof(buf))) {
+			if (!g_getline(buf, sizeof(buf))) {
 				curmove = RESIGN;
 				break;
 			}
 			if (buf[0] == '\0')
 				goto getinput;
-			curmove = ctos(buf);
+			curmove = g_ctos(buf);
 			if (interactive) {
 				if (curmove == SAVE) {
 					FILE *fp;
 
 					ask("save file name? ");
-					(void)getline(buf, sizeof(buf));
+					(void)g_getline(buf, sizeof(buf));
 					if ((fp = fopen(buf, "w")) == NULL) {
 						glog("cannot create save file");
 						goto getinput;
 					}
 					for (i = 0; i < movenum - 1; i++)
 						fprintf(fp, "%s\n",
-							stoc(movelog[i]));
+							g_stoc(movelog[i]));
 					fclose(fp);
 					goto getinput;
 				}
@@ -280,7 +280,7 @@ again:
 			break;
 		}
 		if (interactive) {
-			sprintf(fmtbuf, fmt[color], movenum, stoc(curmove));
+			sprintf(fmtbuf, fmt[color], movenum, g_stoc(curmove));
 			glog(fmtbuf);
 		}
 		if ((i = makemove(color, curmove)) != MOVEOK)
@@ -309,21 +309,21 @@ again:
 		if (i != RESIGN) {
 		replay:
 			ask("replay? ");
-			if (getline(buf, sizeof(buf)) &&
+			if (g_getline(buf, sizeof(buf)) &&
 			    (buf[0] == 'y' || buf[0] == 'Y'))
 				goto again;
 			if (strcmp(buf, "save") == 0) {
 				FILE *fp;
 
 				ask("save file name? ");
-				(void)getline(buf, sizeof(buf));
+				(void)g_getline(buf, sizeof(buf));
 				if ((fp = fopen(buf, "w")) == NULL) {
 					glog("cannot create save file");
 					goto replay;
 				}
 				for (i = 0; i < movenum - 1; i++)
 					fprintf(fp, "%s\n",
-						stoc(movelog[i]));
+						g_stoc(movelog[i]));
 				fclose(fp);
 				goto replay;
 			}
@@ -345,7 +345,7 @@ readinput(fp)
 	while ((c = getc(fp)) != EOF && c != '\n')
 		*cp++ = c;
 	*cp = '\0';
-	return (ctos(fmtbuf));
+	return (g_ctos(fmtbuf));
 }
 
 #ifdef DEBUG
@@ -367,7 +367,7 @@ whatsup(signum)
 		quit();
 top:
 	ask("cmd? ");
-	if (!getline(fmtbuf, sizeof(fmtbuf)))
+	if (!g_getline(fmtbuf, sizeof(fmtbuf)))
 		quit();
 	switch (*fmtbuf) {
 	case '\0':
@@ -391,7 +391,7 @@ top:
 	case 's':		/* suggest a move */
 		i = fmtbuf[1] == 'b' ? BLACK : WHITE;
 		sprintf(fmtbuf, "suggest %c %s", i == BLACK ? 'B' : 'W',
-			stoc(pickmove(i)));
+			g_stoc(pickmove(i)));
 		dlog(fmtbuf);
 		goto top;
 	case 'f':		/* go forward a move */
@@ -402,15 +402,15 @@ top:
 	case 'l':		/* print move history */
 		if (fmtbuf[1] == '\0') {
 			for (i = 0; i < movenum - 1; i++)
-				dlog(stoc(movelog[i]));
+				dlog(g_stoc(movelog[i]));
 			goto top;
 		}
 		if ((fp = fopen(fmtbuf + 1, "w")) == NULL)
 			goto top;
 		for (i = 0; i < movenum - 1; i++) {
-			fprintf(fp, "%s", stoc(movelog[i]));
+			fprintf(fp, "%s", g_stoc(movelog[i]));
 			if (++i < movenum - 1)
-				fprintf(fp, " %s\n", stoc(movelog[i]));
+				fprintf(fp, " %s\n", g_stoc(movelog[i]));
 			else
 				fputc('\n', fp);
 		}
@@ -425,12 +425,12 @@ top:
 					if (str[-1] == pdir[d1])
 						break;
 				str[-1] = '\0';
-				sp = &board[s1 = ctos(fmtbuf + 1)];
+				sp = &board[s1 = g_ctos(fmtbuf + 1)];
 				n = (sp->s_frame[d1] - frames) * FAREA;
 				*str++ = '\0';
 				break;
 			}
-		sp = &board[s2 = ctos(str)];
+		sp = &board[s2 = g_ctos(str)];
 		while (*str)
 			str++;
 		for (d2 = 0; d2 < 4; d2++)
@@ -438,24 +438,24 @@ top:
 				break;
 		n += sp->s_frame[d2] - frames;
 		str = fmtbuf;
-		sprintf(str, "overlap %s%c,", stoc(s1), pdir[d1]);
+		sprintf(str, "overlap %s%c,", g_stoc(s1), pdir[d1]);
 		str += strlen(str);
-		sprintf(str, "%s%c = %x", stoc(s2), pdir[d2], overlap[n]);
+		sprintf(str, "%s%c = %x", g_stoc(s2), pdir[d2], overlap[n]);
 		dlog(fmtbuf);
 		goto top;
 	case 'p':
-		sp = &board[i = ctos(fmtbuf + 1)];
-		sprintf(fmtbuf, "V %s %x/%d %d %x/%d %d %d %x", stoc(i),
+		sp = &board[i = g_ctos(fmtbuf + 1)];
+		sprintf(fmtbuf, "V %s %x/%d %d %x/%d %d %d %x", g_stoc(i),
 			sp->s_combo[BLACK].s, sp->s_level[BLACK],
 			sp->s_nforce[BLACK],
 			sp->s_combo[WHITE].s, sp->s_level[WHITE],
 			sp->s_nforce[WHITE], sp->s_wval, sp->s_flg);
 		dlog(fmtbuf);
-		sprintf(fmtbuf, "FB %s %x %x %x %x", stoc(i),
+		sprintf(fmtbuf, "FB %s %x %x %x %x", g_stoc(i),
 			sp->s_fval[BLACK][0].s, sp->s_fval[BLACK][1].s,
 			sp->s_fval[BLACK][2].s, sp->s_fval[BLACK][3].s);
 		dlog(fmtbuf);
-		sprintf(fmtbuf, "FW %s %x %x %x %x", stoc(i),
+		sprintf(fmtbuf, "FW %s %x %x %x %x", g_stoc(i),
 			sp->s_fval[WHITE][0].s, sp->s_fval[WHITE][1].s,
 			sp->s_fval[WHITE][2].s, sp->s_fval[WHITE][3].s);
 		dlog(fmtbuf);
@@ -466,7 +466,7 @@ top:
 			n = *str++ - '0';
 		else
 			n = 0;
-		sp = &board[i = ctos(str)];
+		sp = &board[i = g_ctos(str)];
 		for (ep = sp->s_empty; ep; ep = ep->e_next) {
 			cbp = ep->e_combo;
 			if (n) {

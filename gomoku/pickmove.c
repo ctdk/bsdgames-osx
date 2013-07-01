@@ -101,7 +101,7 @@ pickmove(us)
 			continue;
 		if (debug && (sp->s_combo[BLACK].c.a == 1 ||
 		    sp->s_combo[WHITE].c.a == 1)) {
-			sprintf(fmtbuf, "- %s %x/%d %d %x/%d %d %d", stoc(sp - board),
+			sprintf(fmtbuf, "- %s %x/%d %d %x/%d %d %d", g_stoc(sp - board),
 				sp->s_combo[BLACK].s, sp->s_level[BLACK],
 				sp->s_nforce[BLACK],
 				sp->s_combo[WHITE].s, sp->s_level[WHITE],
@@ -119,14 +119,14 @@ pickmove(us)
 
 	if (debug) {
 		sprintf(fmtbuf, "B %s %x/%d %d %x/%d %d %d",
-			stoc(sp1 - board),
+			g_stoc(sp1 - board),
 			sp1->s_combo[BLACK].s, sp1->s_level[BLACK],
 			sp1->s_nforce[BLACK],
 			sp1->s_combo[WHITE].s, sp1->s_level[WHITE],
 			sp1->s_nforce[WHITE], sp1->s_wval);
 		dlog(fmtbuf);
 		sprintf(fmtbuf, "W %s %x/%d %d %x/%d %d %d",
-			stoc(sp2 - board),
+			g_stoc(sp2 - board),
 			sp2->s_combo[WHITE].s, sp2->s_level[WHITE],
 			sp2->s_nforce[WHITE],
 			sp2->s_combo[BLACK].s, sp2->s_level[BLACK],
@@ -680,7 +680,7 @@ makecombo(ocbp, osp, off, s)
 #ifdef DEBUG
 		if (sp->s_occ != EMPTY) {
 		    sprintf(fmtbuf, "loop: %c %s", "BW"[curcolor],
-			stoc(sp - board));
+			g_stoc(sp - board));
 		    dlog(fmtbuf);
 		    whatsup(0);
 		}
@@ -933,7 +933,7 @@ makeempty(ocbp)
 			nep->e_fval.s = ep->e_fval.s;
 			if (debug > 2) {
 				sprintf(fmtbuf, "e %s o%d i%d c%d m%x %x",
-					stoc(sp - board),
+					g_stoc(sp - board),
 					nep->e_off,
 					nep->e_frameindex,
 					nep->e_framecnt,
@@ -1234,12 +1234,12 @@ sortcombo(scbpp, cbpp, fcbp)
 	if (debug > 3) {
 		char *str;
 
-		sprintf(fmtbuf, "sortc: %s%c l%d", stoc(fcbp->c_vertex),
+		sprintf(fmtbuf, "sortc: %s%c l%d", g_stoc(fcbp->c_vertex),
 			pdir[fcbp->c_dir], curlevel);
 		dlog(fmtbuf);
 		str = fmtbuf;
 		for (cpp = cbpp; cpp < cbpp + curlevel; cpp++) {
-			sprintf(str, " %s%c", stoc((*cpp)->c_vertex),
+			sprintf(str, " %s%c", g_stoc((*cpp)->c_vertex),
 				pdir[(*cpp)->c_dir]);
 			str += strlen(str);
 		}
@@ -1272,7 +1272,7 @@ inserted:
 		 * Easy case, this list hasn't been seen.
 		 * Add it to the hash list.
 		 */
-		fcbp = (struct combostr *)
+		fcbp = (struct combostr *)(void *)
 			((char *)scbpp - sizeof(struct combostr));
 		hashcombos[inx] = fcbp;
 		fcbp->c_next = fcbp->c_prev = fcbp;
@@ -1297,7 +1297,7 @@ inserted:
 			dlog(fmtbuf);
 			str = fmtbuf;
 			for (cpp = scbpp; cpp < scbpp + n; cpp++) {
-				sprintf(str, " %s%c", stoc((*cpp)->c_vertex),
+				sprintf(str, " %s%c", g_stoc((*cpp)->c_vertex),
 					pdir[(*cpp)->c_dir]);
 				str += strlen(str);
 			}
@@ -1307,7 +1307,7 @@ inserted:
 			str = fmtbuf;
 			cbpp--;
 			for (cpp = cbpp; cpp < cbpp + n; cpp++) {
-				sprintf(str, " %s%c", stoc((*cpp)->c_vertex),
+				sprintf(str, " %s%c", g_stoc((*cpp)->c_vertex),
 					pdir[(*cpp)->c_dir]);
 				str += strlen(str);
 			}
@@ -1323,7 +1323,7 @@ inserted:
 	 * Add it to the hash list.
 	 */
 	ecbp = cbp->c_prev;
-	fcbp = (struct combostr *)((char *)scbpp - sizeof(struct combostr));
+	fcbp = (struct combostr *)(void *)((char *)scbpp - sizeof(struct combostr));
 	fcbp->c_next = cbp;
 	fcbp->c_prev = ecbp;
 	cbp->c_prev = fcbp;
@@ -1344,11 +1344,11 @@ printcombo(cbp, str)
 	sprintf(str, "%x/%d", cbp->c_combo.s, cbp->c_nframes);
 	str += strlen(str);
 	for (; (tcbp = cbp->c_link[1]) != NULL; cbp = cbp->c_link[0]) {
-		sprintf(str, " %s%c%x", stoc(tcbp->c_vertex), pdir[tcbp->c_dir],
+		sprintf(str, " %s%c%x", g_stoc(tcbp->c_vertex), pdir[tcbp->c_dir],
 			cbp->c_flg);
 		str += strlen(str);
 	}
-	sprintf(str, " %s%c", stoc(cbp->c_vertex), pdir[cbp->c_dir]);
+	sprintf(str, " %s%c", g_stoc(cbp->c_vertex), pdir[cbp->c_dir]);
 }
 
 #ifdef DEBUG

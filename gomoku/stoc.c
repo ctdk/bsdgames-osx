@@ -63,7 +63,7 @@ static	const struct	mvstr	mv[] = {
  * Turn the spot number form of a move into the character form.
  */
 const char *
-stoc(s)
+g_stoc(s)
 	int s;
 {
 	static char buf[32];
@@ -80,7 +80,7 @@ stoc(s)
  * Turn the character form of a move into the spot number form.
  */
 int
-ctos(mp)
+g_ctos(mp)
 	const char *mp;
 {
 	int i;
@@ -93,14 +93,14 @@ ctos(mp)
 	i = atoi(&mp[1]);
 	if (i < 1 || i > 19)
 		return(ILLEGAL);
-	return(PT(lton(mp[0]), i));
+	return(PT(g_lton(mp[0]), i));
 }
 
 /*
  * Turn a letter into a number.
  */
 int
-lton(c)
+g_lton(c)
 	int c;
 {
 	int i;

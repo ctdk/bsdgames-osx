@@ -35,7 +35,7 @@
  */
 
 #include <sys/types.h>
-#include <sys/endian.h>
+#include <sys/param.h>
 #include <stdio.h>
 
 /* board dimensions */
@@ -263,7 +263,7 @@ extern	int	debug;
 
 void	bdinit(struct spotstr *);
 void	init_overlap(void);
-int	getline(char *, int);
+int 	g_getline(char *, int);
 void	ask(const char *);
 void	dislog(const char *);
 void	bdump(FILE *);
@@ -279,9 +279,9 @@ void	quit(void) __attribute__((__noreturn__));
 void	quitsig(int) __attribute__((__noreturn__));
 void	whatsup(int);
 int	readinput(FILE *);
-const char   *stoc(int);
-int	lton(int);
-int	ctos(const char *);
+const char   *g_stoc(int);
+int	g_lton(int);
+int	g_ctos(const char *);
 void	update_overlap(struct spotstr *);
 int	makemove(int, int);
 int	list_eq(struct combostr **, struct combostr **, int);
