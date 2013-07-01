@@ -79,7 +79,7 @@ easier. See BUGS for information for 10.7 users (at least), however.
 
 BUGS
 ----
-Currently, to the best of my knowledge, all games are building and running.
+dab is not building on 10.8, but is on 10.7.
 
 Many of these programs have hard coded paths. Currently all of them are now
 changed to sensible defaults under /usr/local, but if you want to install 
