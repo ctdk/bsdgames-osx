@@ -13,6 +13,12 @@ them. I am also not responsible if they blow up your computer, lure aliens to
 your house, run up huge credit card bills, eat your dog, or give you a menacing
 side-eye. There's also NO WARRANTY, implied or otherwise.
 
+*** hunt used to use hosts.allow and hosts.deny for access to the huntd server.
+Mac OS 10.8 "Mountain Lion", however, has dropped tcp_wrappers from the
+operating system. If you do run hunt on a server connected directly to the
+Internet, use firewall rules to control who can connect to the huntd server
+rather than hosts.allow and hosts.deny. ***
+
 Games included are:
 
 	adventure 
@@ -71,10 +77,7 @@ easier. See BUGS for information for 10.7 users (at least), however.
 
 BUGS
 ----
-Currently the only game failing to build is hunt. hunt is now building on 10.7,
-but libwrap and tcpd.h were removed in Mountain Lion, and the huntd server 
-needs it to compile. Thus, while the hunt client builds on Mountain Lion, hunt
-as a whole is still not working on Mountain Lion.
+Currently, to the best of my knowledge, all games are building and running.
 
 Many of these programs have hard coded paths. Currently all of them are now
 changed to sensible defaults under /usr/local, but if you want to install 

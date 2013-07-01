@@ -1,0 +1,5 @@
+hunt used to use hosts.allow and hosts.deny for access to the huntd server. Mac 
+OS 10.8 "Mountain Lion", however, has dropped tcp_wrappers from the operating 
+system, so the code using libwrap has been removed from hunt. If you do run 
+hunt on a server connected directly to the Internet, use firewall rules or put it in a firewalled network to control who can connect to the huntd server rather
+than hosts.allow and hosts.deny.
