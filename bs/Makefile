@@ -7,4 +7,9 @@ DPADD=  ${LIBNCURSES}
 LDADD=  -lncurses
 HIDEGAME=hidegame
 
+beforeinstall:
+.if !exists(${MANDIR}6)
+	mkdir -p ${MANDIR}6
+.endif
+
 .include <bsd.prog.mk>

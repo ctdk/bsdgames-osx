@@ -23,5 +23,8 @@ beforeinstall:
 	${INSTALL} -o ${BINOWN} -g ${BINGRP} -m 664 /dev/null \
 	    ${PREFIX}/var/games/criblog
 .endif
+.if !exists(${MANDIR}6)
+	mkdir -p ${MANDIR}6
+.endif
 
 .include <bsd.prog.mk>

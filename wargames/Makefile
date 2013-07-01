@@ -5,4 +5,9 @@
 SCRIPTS=wargames.sh
 MAN=	wargames.6
 
+beforeinstall:
+.if !exists(${MANDIR}6)
+	mkdir -p ${MANDIR}6
+.endif
+
 .include <bsd.prog.mk>

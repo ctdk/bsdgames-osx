@@ -16,4 +16,9 @@ MAN=	factor.6
 MLINKS+=factor.6 primes.6
 .PATH:	${.CURDIR}/../primes
 
+beforeinstall:
+.if !exists(${MANDIR}6)
+	mkdir -p ${MANDIR}6
+.endif
+
 .include <bsd.prog.mk>

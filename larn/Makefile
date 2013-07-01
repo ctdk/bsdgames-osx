@@ -72,5 +72,8 @@ beforeinstall:
 	${INSTALL} -o ${BINOWN} -g ${BINGRP} -m 660 /dev/null \
 	    ${PREFIX}/var/games/larn/llog12.0
 .endif
+.if !exists(${MANDIR}6)
+	mkdir -p ${MANDIR}6
+.endif
 
 .include <bsd.prog.mk>

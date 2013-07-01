@@ -13,4 +13,9 @@ build-tools: setup.nx
 data.c: glorkz setup.nx
 	./setup.nx ${.CURDIR}/glorkz > data.c
 
+beforeinstall:
+.if !exists(${MANDIR}6)
+	mkdir -p ${MANDIR}6
+.endif
+
 .include <bsd.prog.mk>

@@ -16,6 +16,9 @@ beforeinstall:
 .if !exists(${FILESDIR})
 	mkdir ${FILESDIR}
 .endif
+.if !exists(${MANDIR}6)
+	mkdir -p ${MANDIR}6
+.endif
 
 .PATH: ${.CURDIR}/datfiles
 

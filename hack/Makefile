@@ -41,6 +41,9 @@ beforeinstall:
 	${INSTALL} -o ${BINOWN} -g ${BINGRP} -m 460 /dev/null \
 	    ${PREFIX}/var/games/hackdir/record
 .endif
+.if !exists(${MANDIR}6)
+	mkdir -p ${MANDIR}6
+.endif
 #	rm -f ${PREFIX}/var/games/hackdir/bones* \
 #	    ${PREFIX}/var/games/hackdir/save/*
 

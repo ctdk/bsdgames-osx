@@ -7,4 +7,9 @@ MAN=	worms.6
 DPADD=	${LIBCURSES} ${LIBTERMCAP}
 LDADD=	-lcurses -ltermcap
 
+beforeinstall:
+.if !exists(${MANDIR}6)
+	mkdir -p ${MANDIR}6
+.endif
+
 .include <bsd.prog.mk>

@@ -10,5 +10,10 @@ LDADD=	-lcurses
 MAN=	mille.6
 HIDEGAME=hidegame
 
+beforeinstall:
+.if !exists(${MANDIR}6)
+	mkdir -p ${MANDIR}6
+.endif
+
 .include <bsd.prog.mk>
 

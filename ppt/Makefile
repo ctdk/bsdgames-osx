@@ -4,7 +4,7 @@
 #
 
 PROG=	ppt
-NOMAN=	noman
+NO_MAN=	noman
 
 .include <bsd.prog.mk>
 

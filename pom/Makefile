@@ -7,4 +7,9 @@ MAN=	pom.6
 DPADD=	${LIBM}
 LDADD=	-lm
 
+beforeinstall:
+.if !exists(${MANDIR}6)
+	mkdir -p ${MANDIR}6
+.endif
+
 .include <bsd.prog.mk>

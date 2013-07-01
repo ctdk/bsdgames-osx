@@ -9,4 +9,9 @@ SCRIPTS=rot13.sh
 MAN=	caesar.6
 MLINKS=	caesar.6 rot13.6
 
+beforeinstall:
+.if !exists(${MANDIR}6)
+	mkdir -p ${MANDIR}6
+.endif
+
 .include <bsd.prog.mk>

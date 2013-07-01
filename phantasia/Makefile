@@ -30,6 +30,9 @@ beforeinstall:
 .if !exists(${PREFIX}/var/games/phantasia)
 	mkdir -p ${PREFIX}/var/games/phantasia
 .endif
+.if !exists(${MANDIR}6)
+	mkdir -p ${MANDIR}6
+.endif
 .for file in ${DATAFILES}
 .if !exists(${PREFIX}/var/games/phantasia/${file})
 	${INSTALL} -o ${BINOWN} -g ${BINGRP} -m 660 \
