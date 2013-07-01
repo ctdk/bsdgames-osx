@@ -13,6 +13,7 @@ SUBDIR= adventure \
 	caesar \
 	canfield \
 	cribbage \
+	dab \
 	factor \
 	fish \
 	grdc \
