@@ -39,10 +39,8 @@
 /*
  * board.C: Board manipulations
  */
-#if 0
 #include "defs.h"
 RCSID("$NetBSD: board.cc,v 1.1 2003/12/27 01:16:55 christos Exp $")
-#endif
 
 #include <stdio.h>
 #include <string.h>

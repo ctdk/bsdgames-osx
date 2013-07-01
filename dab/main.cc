@@ -39,10 +39,8 @@
 /*
  * main.C: Main dots program
  */
-#if 0
 #include "defs.h"
 RCSID("$NetBSD: main.cc,v 1.2 2003/12/28 17:53:48 thorpej Exp $")
-#endif
 
 #include <iostream>
 #include <unistd.h>
