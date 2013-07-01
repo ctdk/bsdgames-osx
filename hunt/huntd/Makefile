@@ -6,8 +6,6 @@ PROG=	huntd
 SRCS=	answer.c conf.c draw.c driver.c execute.c expl.c \
 	extern.c makemaze.c shots.c terminal.c
 MAN=	huntd.6
-LDADD+=	-lwrap
-DPADD+= ${LIBWRAP}
 
 .include "../../Makefile.inc"
 .include <bsd.prog.mk>

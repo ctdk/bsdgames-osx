@@ -45,7 +45,6 @@
 #include <stdio.h>
 #include <syslog.h>
 #include <string.h>
-#include <tcpd.h>
 
 #include "hunt.h"
 #include "server.h"
@@ -70,7 +69,6 @@ answer_first(void)
 	int			newsock;
 	socklen_t		socklen;
 	int			flags;
-	struct request_info	ri;
 	struct spawn *sp;
 
 	/* Answer the call to hunt: */
@@ -78,15 +76,6 @@ answer_first(void)
 	newsock = accept(Socket, (struct sockaddr *) &sockstruct, &socklen);
 	if (newsock < 0) {
 		logit(LOG_ERR, "accept");
-		return;
-	}
-
-	/* Check for access permissions: */
-	request_init(&ri, RQ_DAEMON, "huntd", RQ_FILE, newsock, 0);
-	fromhost(&ri);
-	if (hosts_access(&ri) == 0) {
-		logx(LOG_INFO, "rejected connection from %s", eval_client(&ri));
-		close(newsock);
 		return;
 	}
 
