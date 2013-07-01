@@ -4,8 +4,8 @@ bsdgames-osx: the classic bsdgames ported to Mac OS X
 These are the classic bsdgames of old. They've been imported from DragonFly 
 BSD's sources (the games in Dragonfly BSD can be found at 
 http://gitweb.dragonflybsd.org/dragonfly.git/tree/v2.4.0:/games), along with 
-some patches from FreeBSD ports, and only modified enough to get them to build 
-on Mac OS X. 
+some patches from FreeBSD ports and a couple of games from NetBSD, and only 
+modified enough to get them to build on Mac OS X. 
 
 WARNING: These games could conceivably be a security risk (that's the warning I
 remember seeing with bsdgames in FreeBSD). If this is a concern, don't install
