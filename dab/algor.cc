@@ -39,8 +39,10 @@
 /*
  * algor.C: Computer algorithm
  */
+#if 0
 #include "defs.h"
 RCSID("$NetBSD: algor.cc,v 1.1 2003/12/27 01:16:55 christos Exp $")
+#endif
 
 #include "algor.h"
 #include "board.h"
