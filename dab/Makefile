@@ -1,6 +1,6 @@
 #	$NetBSD: Makefile,v 1.3 2004/01/05 15:35:59 christos Exp $
 
-WARNS=2
+WARNS=0
 DPADD+=${LIBCURSES} ${LIBTERMCAP} ${LIBM}
 LDADD+=-lcurses -ltermcap -lm
 
