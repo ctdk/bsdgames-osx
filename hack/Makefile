@@ -41,7 +41,7 @@ beforeinstall:
 	${INSTALL} -o ${BINOWN} -g ${BINGRP} -m ${NOBINMODE} /dev/null \
 	    ${VARDIR}/hackdir/perm
 .if !exists(${VARDIR}/hackdir/record)
-	${INSTALL} -o ${BINOWN} -g ${BINGRP} -m 460 /dev/null \
+	${INSTALL} -o ${BINOWN} -g ${BINGRP} -m 660 /dev/null \
 	    ${VARDIR}/hackdir/record
 .endif
 .if !exists(${MANDIR}6)
