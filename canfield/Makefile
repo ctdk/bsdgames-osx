@@ -3,8 +3,8 @@
 SUBDIR= canfield cfscores
 
 beforeinstall:
-.if !exists(${PREFIX}/var/games)
-	mkdir -p ${PREFIX}/var/games
+.if !exists(${VARDIR})
+	mkdir -p ${VARDIR}
 .endif
 .if !exists(${MANDIR}6)
 	mkdir -p ${MANDIR}6

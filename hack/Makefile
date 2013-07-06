@@ -22,7 +22,7 @@ CFLAGS+= -I${.CURDIR} -I.
 FILES=	rumors help hh data
 FILESMODE_rumors=	440
 FILESGRP=	${BINGRP}
-FILESDIR=	${PREFIX}/var/games/hackdir
+FILESDIR=	${VARDIR}/hackdir
 HIDEGAME=hidegame
 CLEANFILES=hack.onames.h makedefs.nx makedefs.no
 
@@ -36,15 +36,15 @@ beforeinstall:
 	mkdir -p ${FILESDIR}
 .endif
 	${INSTALL} -o ${BINOWN} -g ${BINGRP} -m ${NOBINMODE} /dev/null \
-	    ${PREFIX}/var/games/hackdir/perm
-.if !exists(${PREFIX}/var/games/hackdir/record)
+	    ${VARDIR}/hackdir/perm
+.if !exists(${VARDIR}/hackdir/record)
 	${INSTALL} -o ${BINOWN} -g ${BINGRP} -m 460 /dev/null \
-	    ${PREFIX}/var/games/hackdir/record
+	    ${VARDIR}/hackdir/record
 .endif
 .if !exists(${MANDIR}6)
 	mkdir -p ${MANDIR}6
 .endif
-#	rm -f ${PREFIX}/var/games/hackdir/bones* \
-#	    ${PREFIX}/var/games/hackdir/save/*
+#	rm -f ${VARDIR}/hackdir/bones* \
+#	    ${VARDIR}/hackdir/save/*
 
 .include <bsd.prog.mk>

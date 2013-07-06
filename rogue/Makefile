@@ -13,12 +13,12 @@ HIDEGAME=hidegame
 MAN=	rogue.6
 
 beforeinstall:
-.if !exists(${PREFIX}/var/games)
-	mkdir -p ${PREFIX}/var/games
+.if !exists(${VARDIR})
+	mkdir -p ${VARDIR}
 .endif
-.if !exists(${PREFIX}/var/games/rogue.scores)
+.if !exists(${VARDIR}/rogue.scores)
 	${INSTALL} -o ${BINOWN} -g ${BINGRP} -m 664 /dev/null \
-	    ${PREFIX}/var/games/rogue.scores
+	    ${VARDIR}/rogue.scores
 .endif
 .if !exists(${MANDIR}6)
 	mkdir -p ${MANDIR}6

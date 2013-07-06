@@ -61,16 +61,16 @@ beforeinstall:
 .if !exists(${FILESDIR})
 	mkdir -p ${FILESDIR}
 .endif
-.if !exists(${PREFIX}/var/games/larn)
-	mkdir -p ${PREFIX}/var/games/larn
+.if !exists(${VARDIR}/larn)
+	mkdir -p ${VARDIR}/larn
 .endif
-.if !exists(${PREFIX}/var/games/larn/lscore12.0)
+.if !exists(${VARDIR}/larn/lscore12.0)
 	${INSTALL} -o ${BINOWN} -g ${BINGRP} -m 660 /dev/null \
-	    ${PREFIX}/var/games/larn/lscore12.0
+	    ${VARDIR}/larn/lscore12.0
 .endif
-.if !exists(${PREFIX}/var/games/larn/llog12.0)
+.if !exists(${VARDIR}/larn/llog12.0)
 	${INSTALL} -o ${BINOWN} -g ${BINGRP} -m 660 /dev/null \
-	    ${PREFIX}/var/games/larn/llog12.0
+	    ${VARDIR}/larn/llog12.0
 .endif
 .if !exists(${MANDIR}6)
 	mkdir -p ${MANDIR}6

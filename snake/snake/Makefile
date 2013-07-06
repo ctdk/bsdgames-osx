@@ -12,15 +12,15 @@ MLINKS=	snake.6 snscore.6
 
 beforeinstall:
 .if !exists(${RPREFIX}/var/games)
-	mkdir -p ${PREFIX}/var/games
+	mkdir -p ${VARDIR}
 .endif
-.if !exists(${PREFIX}/var/games/snakerawscores)
+.if !exists(${VARDIR}/snakerawscores)
 	${INSTALL} -o ${BINOWN} -g ${BINGRP} -m 664 /dev/null \
-	    ${PREFIX}/var/games/snakerawscores
+	    ${VARDIR}/snakerawscores
 .endif
-.if !exists(${PREFIX}/var/games/snake.log)
+.if !exists(${VARDIR}/snake.log)
 	${INSTALL} -o ${BINOWN} -g ${BINGRP} -m 664 /dev/null \
-	    ${PREFIX}/var/games/snake.log
+	    ${VARDIR}/snake.log
 .endif
 
 .include "../../Makefile.inc"

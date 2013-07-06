@@ -12,12 +12,12 @@ LDADD=	-lcurses
 HIDEGAME=hidegame
 
 beforeinstall:
-.if !exists(${PREFIX}/var/games)
-	mkdir -p ${PREFIX}/var/games
+.if !exists(${VARDIR})
+	mkdir -p ${VARDIR}
 .endif
-.if !exists(${PREFIX}/var/games/robots_roll)
+.if !exists(${VARDIR}/robots_roll)
 	${INSTALL} -o ${BINOWN} -g ${BINGRP} -m 664 /dev/null \
-	    ${PREFIX}/var/games/robots_roll
+	    ${VARDIR}/robots_roll
 .endif
 .if !exists(${MANDIR}6)
 	mkdir -p ${MANDIR}6

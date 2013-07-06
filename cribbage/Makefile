@@ -16,12 +16,12 @@ beforeinstall:
 .if !exists(${FILESDIR})
 	mkdir -p ${FILESDIR}
 .endif
-.if !exists(${PREFIX}/var/games)
-	mkdir -p ${PREFIX}/var/games
+.if !exists(${VARDIR})
+	mkdir -p ${VARDIR}
 .endif
-.if !exists(${PREFIX}/var/games/criblog)
+.if !exists(${VARDIR}/criblog)
 	${INSTALL} -o ${BINOWN} -g ${BINGRP} -m 664 /dev/null \
-	    ${PREFIX}/var/games/criblog
+	    ${VARDIR}/criblog
 .endif
 .if !exists(${MANDIR}6)
 	mkdir -p ${MANDIR}6
