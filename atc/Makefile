@@ -16,6 +16,9 @@ HIDEGAME=hidegame
 .PATH: ${.CURDIR}/games
 
 beforeinstall:
+.if !exists(${BINDIR})
+	mkdir -p ${BINDIR}
+.endif
 .if !exists(${FILESDIR})
 	mkdir -p ${FILESDIR}
 .endif

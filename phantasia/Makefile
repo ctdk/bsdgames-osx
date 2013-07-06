@@ -27,6 +27,9 @@ setup.nx: cross-phantglobs.no setup.no ${LIBM}
 	${NXCC} ${NXCFLAGS} ${NXLDFLAGS} ${.ALLSRC} ${NXLDLIBS} -o ${.TARGET}
 
 beforeinstall:
+.if !exists(${BINDIR})
+	mkdir -p ${BINDIR}
+.endif
 .if !exists(${VARDIR}/phantasia)
 	mkdir -p ${VARDIR}/phantasia
 .endif

@@ -58,6 +58,9 @@ HIDEGAME=hidegame
 .PATH: ${.CURDIR}/datfiles
 
 beforeinstall:
+.if !exists(${BINDIR})
+	mkdir -p ${BINDIR}
+.endif
 .if !exists(${FILESDIR})
 	mkdir -p ${FILESDIR}
 .endif

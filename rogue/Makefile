@@ -13,6 +13,9 @@ HIDEGAME=hidegame
 MAN=	rogue.6
 
 beforeinstall:
+.if !exists(${BINDIR})
+	mkdir -p ${BINDIR}
+.endif
 .if !exists(${VARDIR})
 	mkdir -p ${VARDIR}
 .endif

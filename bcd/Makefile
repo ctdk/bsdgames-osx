@@ -7,6 +7,9 @@ MAN=	bcd.6
 MLINKS=	bcd.6 ppt.6
 
 beforeinstall:
+.if !exists(${BINDIR})
+	mkdir -p ${BINDIR}
+.endif
 .if !exists(${MANDIR}6)
 	mkdir -p ${MANDIR}6
 .endif

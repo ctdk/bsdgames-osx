@@ -7,4 +7,9 @@ NO_MAN=	noman
 DPADD=	${LIBM}
 LDADD=	-lm
 
+beforeinstall:
+.if !exists(${BINDIR})
+	mkdir -p ${BINDIR}
+.endif
+
 .include <bsd.prog.mk>

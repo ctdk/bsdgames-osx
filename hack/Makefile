@@ -32,6 +32,9 @@ hack.onames.h: makedefs.nx def.objects.h
 	./makedefs.nx ${.CURDIR}/def.objects.h > hack.onames.h
 
 beforeinstall:
+.if !exists(${BINDIR})
+	mkdir -p ${BINDIR}
+.endif
 .if !exists(${FILESDIR})
 	mkdir -p ${FILESDIR}
 .endif

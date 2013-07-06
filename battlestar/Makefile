@@ -12,6 +12,9 @@ LDADD=	-lcurses -ltermcap
 HIDEGAME=hidegame
 
 beforeinstall:
+.if !exists(${BINDIR})
+	mkdir -p ${BINDIR}
+.endif
 .if !exists(${VARDIR})
 	mkdir -p ${VARDIR}
 .endif

@@ -14,6 +14,9 @@ data.c: glorkz setup.nx
 	./setup.nx ${.CURDIR}/glorkz > data.c
 
 beforeinstall:
+.if !exists(${BINDIR})
+	mkdir -p ${BINDIR}
+.endif
 .if !exists(${MANDIR}6)
 	mkdir -p ${MANDIR}6
 .endif

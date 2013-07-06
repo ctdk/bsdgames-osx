@@ -8,6 +8,9 @@ MAN=	wump.6
 HIDEGAME=hidegame
 
 beforeinstall:
+.if !exists(${BINDIR})
+	mkdir -p ${BINDIR}
+.endif
 .if !exists(${FILESDIR})
 	mkdir -p ${FILESDIR}
 .endif

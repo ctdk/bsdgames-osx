@@ -12,7 +12,9 @@ MAN=	cribbage.6
 HIDEGAME=hidegame
 
 beforeinstall:
-beforeinstall:
+.if !exists(${BINDIR})
+	mkdir -p ${BINDIR}
+.endif
 .if !exists(${FILESDIR})
 	mkdir -p ${FILESDIR}
 .endif

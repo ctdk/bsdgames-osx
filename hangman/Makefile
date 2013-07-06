@@ -11,6 +11,9 @@ LDADD=	-lcurses
 HIDEGAME=hidegame
 
 beforeinstall:
+.if !exists(${BINDIR})
+	mkdir -p ${BINDIR}
+.endif
 .if !exists(${MANDIR}6)
 	mkdir -p ${MANDIR}6
 .endif

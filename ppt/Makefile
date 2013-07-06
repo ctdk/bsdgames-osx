@@ -6,5 +6,10 @@
 PROG=	ppt
 NO_MAN=	noman
 
+beforeinstall:
+.if !exists(${BINDIR})
+	mkdir -p ${BINDIR}
+.endif
+
 .include <bsd.prog.mk>
 
