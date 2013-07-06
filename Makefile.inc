@@ -7,6 +7,7 @@ BINDIR?=	${PREFIX}/bin
 SHAREDIR=	${PREFIX}/share
 MANDIR=		${SHAREDIR}/man/man
 FILESDIR?=	${SHAREDIR}/games
+VARDIR?= 	${PREFIX}/var/games
 WARNS?=		6
 
 BINGRP?=	staff
