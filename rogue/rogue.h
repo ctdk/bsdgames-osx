@@ -226,7 +226,7 @@ struct id {
 
 struct obj {				/* comment is monster meaning */
 	unsigned long m_flags;	/* monster flags */
-	const char *damage;		/* damage it does */
+	char damage[8];		/* damage it does */
 	short quantity;			/* hit points to kill */
 	short ichar;			/* 'A' is for aquatar */
 	short kill_exp;			/* exp for killing it */
