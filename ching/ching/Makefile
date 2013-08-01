@@ -5,8 +5,11 @@ MAN=	ching.6
 
 .include <bsd.own.mk>
 
+SHAREDIR=	${PREFIX}/share
 FILES=	hexagrams macros
 FILESDIR?= ${SHAREDIR}/games
+MANDIR=		${SHAREDIR}/man/man
+FILESDIR?=	${SHAREDIR}/games
 
 beforeinstall:
 .if !exists(${BINDIR})
