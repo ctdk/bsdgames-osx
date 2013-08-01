@@ -1,0 +1,23 @@
+Below is the commit note for ching from NetBSD. It explains this particular
+version of ching and how it can be distributed now, along with some changes the
+NetBSD developer "perry" made bringing it over.
+---
+ching(6) -- The Book of Changes, not seen in BSD since 4.4BSD.
+
+The C code is a complete rewrite done by Guy Harris for 4.4BSD and is
+not the original from v7 at all. Unfortunately, the data file itself,
+without which the rest isn't useful, was not freed until Caldera
+released all of 32v a few years ago, so it was not in 4.4lite.
+
+The data file, the ching nroff macros, and the driver script are under
+Caldera or Caldera+Berkeley copyright.
+
+I've partially redone the driver script from 4.4 (there was no point
+in using a temporary file for the hexagram), which was already
+partially redone from 32v. (As an aside, it is nutty that the script
+needs a copyright so many times longer than the code.)
+
+I've renamed "cno" to "castching", "phx" to "printching", (the
+traditional names were opaque), and put them in /usr/libexec/ching
+instead of the v7 /usr/games/ching.d. The data file and nroff macros
+are in /usr/share/games/ching
