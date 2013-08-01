@@ -9,7 +9,7 @@ SHAREDIR=	${PREFIX}/share
 FILES=	hexagrams macros
 FILESDIR?= ${SHAREDIR}/games
 MANDIR=		${SHAREDIR}/man/man
-FILESDIR?=	${SHAREDIR}/games
+FILESGRP= ${BINGRP}
 
 beforeinstall:
 .if !exists(${BINDIR})
