@@ -3,4 +3,5 @@
 CPPFLAGS+=-I${.CURDIR}/../include
 CFLAGS+=-I${.CURDIR}/../include
 BINDIR?=${PREFIX}/bin
+BINGRP?=staff
 WARNS?=4
