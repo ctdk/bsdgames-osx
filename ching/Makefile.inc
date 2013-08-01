@@ -2,5 +2,5 @@
 
 CPPFLAGS+=-I${.CURDIR}/../include
 CFLAGS+=-I${.CURDIR}/../include
-BINDIR?=/usr/games
+BINDIR?=${PREFIX}/bin
 WARNS?=4
