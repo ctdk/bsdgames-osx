@@ -30,6 +30,7 @@ Games included are:
 	bs 
 	caesar 
 	canfield 
+	ching
 	cribbage 
 	dab
 	factor 
@@ -102,7 +103,7 @@ COPYRIGHT
 ---------
 See the COPYRIGHT file & the source for the programs themselves. I claim no
 authorship of them. Most of the games were imported from Dragonfly BSD, but
-gomoku and dab were from NetBSD.
+gomoku, dab, and ching were from NetBSD.
 
 "AUTHOR"
 --------

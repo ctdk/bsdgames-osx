@@ -11,6 +11,7 @@ SUBDIR= adventure \
 	bcd \
 	bs \
 	caesar \
+	ching \
 	canfield \
 	cribbage \
 	dab \
