@@ -59,6 +59,7 @@ Games included are:
 	wargames 
 	worm 
 	worms 
+	wtf
 	wump
 
 INSTALLATION
@@ -103,7 +104,7 @@ COPYRIGHT
 ---------
 See the COPYRIGHT file & the source for the programs themselves. I claim no
 authorship of them. Most of the games were imported from Dragonfly BSD, but
-gomoku, dab, and ching were from NetBSD.
+gomoku, dab, ching, and wtf were from NetBSD.
 
 "AUTHOR"
 --------

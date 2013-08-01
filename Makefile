@@ -41,6 +41,7 @@ SUBDIR= adventure \
 	wargames \
 	worm \
 	worms \
+	wtf \
 	wump
 
 # maximum parallelism
