@@ -3,7 +3,7 @@
 SCRIPTS=ching.sh
 MAN=	ching.6
 
-.include <bsd.own.mk>
+#.include <bsd.own.mk>
 
 SHAREDIR=	${PREFIX}/share
 FILES=	hexagrams macros
