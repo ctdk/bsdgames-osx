@@ -10,6 +10,8 @@ FILES=	hexagrams macros
 FILESDIR?= ${SHAREDIR}/games
 MANDIR=		${SHAREDIR}/man/man
 FILESGRP= ${BINGRP}
+SHAREGRP= ${BINGRP}
+MANGRP= ${BINGRP}
 
 beforeinstall:
 .if !exists(${BINDIR})
