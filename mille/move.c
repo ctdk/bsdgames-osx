@@ -65,25 +65,25 @@ domove(void)
 		getmove();
 	else
 		calcmove();
-	Next = FALSE;
-	goodplay = TRUE;
+	Next = false;
+	goodplay = true;
 	switch (Movetype) {
 	  case M_DISCARD:
 		if (haspicked(pp)) {
 			if (pp->hand[Card_no] == C_INIT)
 				if (Card_no == 6)
-					Finished = TRUE;
+					Finished = true;
 				else
 					error("no card there");
 			else {
 				if (issafety(pp->hand[Card_no])) {
 					error("discard a safety?");
-					goodplay = FALSE;
+					goodplay = false;
 					break;
 				}
 				Discard = pp->hand[Card_no];
 				pp->hand[Card_no] = C_INIT;
-				Next = TRUE;
+				Next = true;
 				if (Play == PLAYER)
 					account(Discard);
 			}
@@ -121,8 +121,8 @@ acc:
 #endif
 				goto acc;
 			}
-			pp->new_battle = FALSE;
-			pp->new_speed = FALSE;
+			pp->new_battle = false;
+			pp->new_speed = false;
 		}
 		break;
 
@@ -185,7 +185,7 @@ check_go(void)
 #endif
 		}
 	}
-	Finished = TRUE;
+	Finished = true;
 }
 
 static bool
@@ -212,7 +212,7 @@ mustpick:
 	if (Debug)
 		fprintf(outf, "PLAYCARD: Card = %s\n", C_name[card]);
 #endif
-	Next = FALSE;
+	Next = false;
 	switch (card) {
 	  case C_200:
 		if (pp->nummiles[C_200] == 2)
@@ -231,7 +231,7 @@ mustpick:
 		pp->total += v;
 		pp->hand_tot += v;
 		if ((pp->mileage += v) == End)
-			check_ext(FALSE);
+			check_ext(false);
 		break;
 
 	  case C_GAS:	case C_SPARE:	case C_REPAIRS:
@@ -239,7 +239,7 @@ mustpick:
 			return error("can't play \"%s\"", C_name[card]);
 		pp->battle = card;
 		if (pp->safety[S_RIGHT_WAY] == S_PLAYED)
-			pp->can_go = TRUE;
+			pp->can_go = true;
 		break;
 
 	  case C_GO:
@@ -248,7 +248,7 @@ mustpick:
 			return error("cannot play \"Go\" on a \"%s\"",
 			    C_name[pp->battle]);
 		pp->battle = C_GO;
-		pp->can_go = TRUE;
+		pp->can_go = true;
 		break;
 
 	  case C_END_LIMIT:
@@ -266,8 +266,8 @@ mustpick:
 protected:
 			return error("opponent is protected");
 		pp->battle = card;
-		pp->new_battle = TRUE;
-		pp->can_go = FALSE;
+		pp->new_battle = true;
+		pp->can_go = false;
 		pp = &Player[Play];
 		break;
 
@@ -278,7 +278,7 @@ protected:
 		if (pp->safety[S_RIGHT_WAY] == S_PLAYED)
 			goto protected;
 		pp->speed = C_LIMIT;
-		pp->new_speed = TRUE;
+		pp->new_speed = true;
 		pp = &Player[Play];
 		break;
 
@@ -288,13 +288,13 @@ protected:
 		    || (card == C_RIGHT_WAY && pp->speed == C_LIMIT)) {
 			if (!(card == C_RIGHT_WAY && !isrepair(pp->battle))) {
 				pp->battle = C_GO;
-				pp->can_go = TRUE;
+				pp->can_go = true;
 			}
 			if (card == C_RIGHT_WAY && pp->speed == C_LIMIT)
 				pp->speed = C_INIT;
 			if (pp->new_battle
 			    || (pp->new_speed && card == C_RIGHT_WAY)) {
-				pp->coups[card - S_CONV] = TRUE;
+				pp->coups[card - S_CONV] = true;
 				pp->total += SC_COUP;
 				pp->hand_tot += SC_COUP;
 				pp->coupscore += SC_COUP;
@@ -316,25 +316,24 @@ protected:
 			if (pp->speed == C_LIMIT)
 				pp->speed = C_INIT;
 			if (pp->battle == C_STOP || pp->battle == C_INIT) {
-				pp->can_go = TRUE;
+				pp->can_go = true;
 				pp->battle = C_INIT;
 			}
 			if (!pp->can_go && isrepair(pp->battle))
-				pp->can_go = TRUE;
+				pp->can_go = true;
 		}
-		Next = -1;
+		Next = false;
 		break;
 
 	  case C_INIT:
 		error("no card there");
-		Next = -1;
+		Next = false;
 		break;
 	}
 	if (pp == &Player[PLAYER])
 		account(card);
 	pp->hand[Card_no] = C_INIT;
-	Next = (Next == -1 ? FALSE : TRUE);
-	return TRUE;
+	return true;
 }
 
 static void
@@ -345,17 +344,17 @@ getmove(void)
 	char	*sp;
 #endif
 #ifdef EXTRAP
-	static bool	last_ex = FALSE;	/* set if last command was E */
+	static bool	last_ex = false;	/* set if last command was E */
 
 	if (last_ex) {
 		undoex();
 		prboard();
-		last_ex = FALSE;
+		last_ex = false;
 	}
 #endif
 	for (;;) {
 		prompt(MOVEPROMPT);
-		leaveok(Board, FALSE);
+		leaveok(Board, false);
 		refresh();
 		while ((c = readch()) == killchar() || c == erasechar())
 			continue;
@@ -394,7 +393,7 @@ getmove(void)
 		  case 'W':		/* Window toggle */
 			Window = nextwin(Window);
 			newscore();
-			prscore(TRUE);
+			prscore(true);
 			wrefresh(Score);
 			break;
 		  case 'R':		/* Redraw screen */
@@ -402,20 +401,20 @@ getmove(void)
 			wrefresh(curscr);
 			break;
 		  case 'S':		/* Save game */
-			On_exit = FALSE;
+			On_exit = false;
 			save();
 			break;
 		  case 'E':		/* Extrapolate */
 #ifdef EXTRAP
 			if (last_ex)
 				break;
-			Finished = TRUE;
+			Finished = true;
 			if (Window != W_FULL)
 				newscore();
-			prscore(FALSE);
+			prscore(false);
 			wrefresh(Score);
-			last_ex = TRUE;
-			Finished = FALSE;
+			last_ex = true;
+			Finished = false;
 #else
 			error("%c: command not implemented", c);
 #endif
@@ -431,7 +430,7 @@ getmove(void)
 				char	buf[MAXPATHLEN];
 
 				prompt(FILEPROMPT);
-				leaveok(Board, FALSE);
+				leaveok(Board, false);
 				refresh();
 				sp = buf;
 				while ((*sp = readch()) != '\n') {
@@ -452,7 +451,7 @@ getmove(void)
 					refresh();
 				}
 				*sp = '\0';
-				leaveok(Board, TRUE);
+				leaveok(Board, true);
 				if ((outf = fopen(buf, "w")) == NULL)
 					perror(buf);
 				setbuf(outf, NULL);
@@ -466,7 +465,7 @@ getmove(void)
 		}
 	}
 ret:
-	leaveok(Board, TRUE);
+	leaveok(Board, true);
 }
 
 /*
@@ -478,7 +477,7 @@ haspicked(PLAY *pp)
 	int	card;
 
 	if (Topcard <= Deck)
-		return TRUE;
+		return true;
 	switch (pp->hand[Card_no]) {
 	  case C_GAS_SAFE:	case C_SPARE_SAFE:
 	  case C_DRIVE_SAFE:	case C_RIGHT_WAY:
