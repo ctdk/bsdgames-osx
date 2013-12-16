@@ -322,17 +322,18 @@ protected:
 			if (!pp->can_go && isrepair(pp->battle))
 				pp->can_go = true;
 		}
-		Next = false;
+		Next = -1;
 		break;
 
 	  case C_INIT:
 		error("no card there");
-		Next = false;
+		Next = -1;
 		break;
 	}
 	if (pp == &Player[PLAYER])
 		account(card);
 	pp->hand[Card_no] = C_INIT;
+	Next = (Next == -1 ? false : true);
 	return true;
 }
 
