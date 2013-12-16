@@ -333,7 +333,7 @@ protected:
 	if (pp == &Player[PLAYER])
 		account(card);
 	pp->hand[Card_no] = C_INIT;
-	Next = (Next == -1 ? false : true);
+	Next = ((int)Next == -1 ? false : true);
 	return true;
 }
 
