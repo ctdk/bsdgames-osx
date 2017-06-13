@@ -68,14 +68,19 @@ INSTALLATION
 bsdmake is needed to build the games. If needed, you can install it out of 
 homebrew (it doesn't come with recent versions of Xcode).
 
-These games have been built on Mac OS X 10.7 Lion, 10.8 Mountain Lion, and 10.9
-Mavericks. They seem to build best with clang - if the compiler complains about
-redundant declarations, "CC=clang bsdmake" seems to work wonders. Under 10.9
-"Mavericks" (or other OS X versions if a newer clang is installed), if the 
-compiler is complaining about "redefinition of typedef 'va_list' is a C11", 
-add CFLAGS="-std=c11" to the build command. For me it was defaulting to clang 
-on Mountain Lion, but to gcc on Lion. Other versions of Mac OS X have not been 
-tested.
+These games have been built on Mac OS X 10.7 Lion through 10.12 Sierra. They 
+seem to build best with clang - if the compiler complains about redundant 
+declarations, "CC=clang bsdmake" seems to work wonders. Under 10.9 "Mavericks" 
+(or other OS X versions if a newer clang is installed), if the compiler is 
+complaining about "redefinition of typedef 'va_list' is a C11", add 
+CFLAGS="-std=c11" to the build command. With 10.12 Sierra, the 
+"-Wno-nullability-completeness" is needed, so use CFLAGS="-std=c11 
+-Wno-nullability-completeness". For me it was defaulting to clang on Mountain 
+Lion, but to gcc on Lion. Other versions of Mac OS X have not been tested - 
+older versions may work, and newer versions may or may not depending on if there
+have been breaking clang/XCode changes (which happens every couple of OS X 
+releases in my experience). Newer versions get tested when I get around to 
+upgrading one of my Macs.
 
 Installation is pretty basic. The steps are to run "bsdmake", then "sudo 
 bsdmake install", and it will install in /usr/local (or elsewhere, if you edit 
