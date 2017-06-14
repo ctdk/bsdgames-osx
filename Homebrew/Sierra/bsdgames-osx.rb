@@ -14,7 +14,7 @@ class BsdgamesOsx < Formula
     inreplace 'wargames/wargames.sh' do |s|
       s.gsub! /\/usr\/games/, "#{prefix}/bin"
     end
-    system "CFLAGS=\"-std=c11\" bsdmake PREFIX=#{prefix} VARDIR=#{HOMEBREW_PREFIX}/var/games"
+    system "CFLAGS=\"-std=c11 -Wno-nullability-completeness\" bsdmake PREFIX=#{prefix} VARDIR=#{HOMEBREW_PREFIX}/var/games"
     user = ENV['USER']
     system "BINOWN=#{user} LIBOWN=#{user} MANOWN=#{user} SHAREOWN=#{user} bsdmake install PREFIX=#{prefix} VARDIR=#{HOMEBREW_PREFIX}/var/games"
   end
