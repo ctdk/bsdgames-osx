@@ -501,7 +501,18 @@ ggetobj(const char *word, int (*fn)(struct obj *), int max)
 	int oletct = 0, iletct = 0;
 	boolean allflag = FALSE;
 	char olets[20], ilets[20];
+
+	#if __has_warning("-Wstrict-prototypes")
+	#pragma clang diagnostic push
+	#pragma clang diagnostic ignored "-Wstrict-prototypes"
+	#endif
+
 	bool (*ckfn)(struct obj *) = (bool (*)()) 0;
+
+	#if __has_warning("-Wstrict-prototypes")
+	#pragma clang diagnostic pop
+	#endif
+
 	xchar allowgold = (u.ugold && !strcmp(word, "drop")) ? 1 : 0; /* BAH */
 
 	if (!invent && !allowgold) {
