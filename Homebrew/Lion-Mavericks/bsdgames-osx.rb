@@ -20,7 +20,7 @@ class BsdgamesOsx < Formula
 
   def test
     %w[ pom ].each do |game|
-  system game
-      end
+      system game
+    end
   end
 end
