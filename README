@@ -78,7 +78,7 @@ CFLAGS="-std=c11" to the build command. With 10.12 Sierra, the
 -Wno-nullability-completeness". For me it was defaulting to clang on Mountain 
 Lion, but to gcc on Lion. Other versions of Mac OS X have not been tested - 
 older versions may work, and newer versions may or may not depending on if there
-have been breaking clang/XCode changes (which happens every couple of OS X 
+have been breaking clang/Xcode changes (which happens every couple of OS X 
 releases in my experience). Newer versions get tested when I get around to 
 upgrading one of my Macs.
 
