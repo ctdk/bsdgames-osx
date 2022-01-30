@@ -155,7 +155,7 @@ show_index(void)
 		for (s = next_cat(qp->q_text); s; s = next_cat(s)) {
 			if (!rxp_compile(s))
 				err("%s", rxperr);
-			if ((p = rxp_expand()) != '\0')
+			if ((p = rxp_expand()) != NULL)
 				(void)fprintf(pf, "%s ", p);
 		}
 		(void)fprintf(pf, "\n");

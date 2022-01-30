@@ -49,6 +49,7 @@ class BOARD;
 class PLAYER {
   public:
     PLAYER(char who);
+    virtual ~PLAYER() {}
     virtual void play(const BOARD& b, size_t& y, size_t& x, int& dir) = 0;
 
     // Helper functions
