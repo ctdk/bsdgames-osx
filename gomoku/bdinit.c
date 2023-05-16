@@ -1,4 +1,4 @@
-/*	$NetBSD: bdinit.c,v 1.5 2003/08/07 09:37:15 agc Exp $	*/
+/*	$NetBSD: bdinit.c,v 1.37 2022/06/19 10:33:17 rillig Exp $	*/
 
 /*
  * Copyright (c) 1994
@@ -33,133 +33,149 @@
  */
 
 #include <sys/cdefs.h>
-#ifndef lint
-#if 0
-static char sccsid[] = "from: @(#)bdinit.c	8.2 (Berkeley) 5/3/95";
-#else
-__RCSID("$NetBSD: bdinit.c,v 1.5 2003/08/07 09:37:15 agc Exp $");
-#endif
-#endif /* not lint */
+/*	from: @(#)bdinit.c	8.2 (Berkeley) 5/3/95	*/
+__RCSID("$NetBSD: bdinit.c,v 1.37 2022/06/19 10:33:17 rillig Exp $");
 
 #include <string.h>
 #include "gomoku.h"
 
-void
-bdinit(bp)
-	struct spotstr *bp;
+static void init_overlap(void);
+
+static void
+init_spot_flags_and_fval(struct spotstr *sp, int col, int row)
 {
-	int i, j, r;
-	struct spotstr *sp;
-	struct combostr *cbp;
 
-	movenum = 1;
-
-	/* mark the borders as such */
-	sp = bp;
-	for (i = BSZ2; --i >= 0; sp++) {
-		sp->s_occ = BORDER;		/* top border */
-		sp->s_flg = BFLAGALL;
+	sp->s_flags = 0;
+	if (row < 5) {
+		set_blocked(sp, DIR_DR);
+		set_blocked(sp, DIR_D_);
+		set_blocked(sp, DIR_DL);
+		sp->s_fval[BLACK][DIR_DR].s = 0x600;
+		sp->s_fval[BLACK][DIR_D_].s = 0x600;
+		sp->s_fval[BLACK][DIR_DL].s = 0x600;
+		sp->s_fval[WHITE][DIR_DR].s = 0x600;
+		sp->s_fval[WHITE][DIR_D_].s = 0x600;
+		sp->s_fval[WHITE][DIR_DL].s = 0x600;
+	} else if (row == 5) {
+		/* five spaces, blocked on one side */
+		sp->s_fval[BLACK][DIR_DR].s = 0x500;
+		sp->s_fval[BLACK][DIR_D_].s = 0x500;
+		sp->s_fval[BLACK][DIR_DL].s = 0x500;
+		sp->s_fval[WHITE][DIR_DR].s = 0x500;
+		sp->s_fval[WHITE][DIR_D_].s = 0x500;
+		sp->s_fval[WHITE][DIR_DL].s = 0x500;
+	} else {
+		/* six spaces, not blocked */
+		sp->s_fval[BLACK][DIR_DR].s = 0x401;
+		sp->s_fval[BLACK][DIR_D_].s = 0x401;
+		sp->s_fval[BLACK][DIR_DL].s = 0x401;
+		sp->s_fval[WHITE][DIR_DR].s = 0x401;
+		sp->s_fval[WHITE][DIR_D_].s = 0x401;
+		sp->s_fval[WHITE][DIR_DL].s = 0x401;
 	}
-
-	/* fill entire board with EMPTY spots */
-	memset(frames, 0, sizeof(frames));
-	cbp = frames;
-	for (j = 0; ++j < BSZ1; sp++) {			/* for each row */
-		for (i = 0; ++i < BSZ1; sp++) {		/* for each column */
-			sp->s_occ = EMPTY;
-			sp->s_flg = 0;
-			sp->s_wval = 0;
-			if (j < 5) {
-				/* directions 1, 2, 3 are blocked */
-				sp->s_flg |= (BFLAG << 1) | (BFLAG << 2) |
-					(BFLAG << 3);
-				sp->s_fval[BLACK][1].s = MAXCOMBO;
-				sp->s_fval[BLACK][2].s = MAXCOMBO;
-				sp->s_fval[BLACK][3].s = MAXCOMBO;
-				sp->s_fval[WHITE][1].s = MAXCOMBO;
-				sp->s_fval[WHITE][2].s = MAXCOMBO;
-				sp->s_fval[WHITE][3].s = MAXCOMBO;
-			} else if (j == 5) {
-				/* five spaces, blocked on one side */
-				sp->s_fval[BLACK][1].s = 0x500;
-				sp->s_fval[BLACK][2].s = 0x500;
-				sp->s_fval[BLACK][3].s = 0x500;
-				sp->s_fval[WHITE][1].s = 0x500;
-				sp->s_fval[WHITE][2].s = 0x500;
-				sp->s_fval[WHITE][3].s = 0x500;
-			} else {
-				/* six spaces, not blocked */
-				sp->s_fval[BLACK][1].s = 0x401;
-				sp->s_fval[BLACK][2].s = 0x401;
-				sp->s_fval[BLACK][3].s = 0x401;
-				sp->s_fval[WHITE][1].s = 0x401;
-				sp->s_fval[WHITE][2].s = 0x401;
-				sp->s_fval[WHITE][3].s = 0x401;
-			}
-			if (i > (BSZ - 4)) {
-				/* directions 0, 1 are blocked */
-				sp->s_flg |= BFLAG | (BFLAG << 1);
-				sp->s_fval[BLACK][0].s = MAXCOMBO;
-				sp->s_fval[BLACK][1].s = MAXCOMBO;
-				sp->s_fval[WHITE][0].s = MAXCOMBO;
-				sp->s_fval[WHITE][1].s = MAXCOMBO;
-			} else if (i == (BSZ - 4)) {
-				sp->s_fval[BLACK][0].s = 0x500;
-				sp->s_fval[WHITE][0].s = 0x500;
-				/* if direction 1 is not blocked */
-				if (!(sp->s_flg & (BFLAG << 1))) {
-					sp->s_fval[BLACK][1].s = 0x500;
-					sp->s_fval[WHITE][1].s = 0x500;
-				}
-			} else {
-				sp->s_fval[BLACK][0].s = 0x401;
-				sp->s_fval[WHITE][0].s = 0x401;
-				if (i < 5) {
-					/* direction 3 is blocked */
-					sp->s_flg |= (BFLAG << 3);
-					sp->s_fval[BLACK][3].s = MAXCOMBO;
-					sp->s_fval[WHITE][3].s = MAXCOMBO;
-				} else if (i == 5 &&
-				    !(sp->s_flg & (BFLAG << 3))) {
-					sp->s_fval[BLACK][3].s = 0x500;
-					sp->s_fval[WHITE][3].s = 0x500;
-				}
-			}
-			/*
-			 * Allocate a frame structure for non blocked frames.
-			 */
-			for (r = 4; --r >= 0; ) {
-				if (sp->s_flg & (BFLAG << r))
-					continue;
-				cbp->c_combo.s = sp->s_fval[BLACK][r].s;
-				cbp->c_vertex = sp - board;
-				cbp->c_nframes = 1;
-				cbp->c_dir = r;
-				sp->s_frame[r] = cbp;
-				cbp++;
-			}
+	if (col > BSZ - 4) {
+		set_blocked(sp, DIR__R);
+		set_blocked(sp, DIR_DR);
+		sp->s_fval[BLACK][DIR__R].s = 0x600;
+		sp->s_fval[BLACK][DIR_DR].s = 0x600;
+		sp->s_fval[WHITE][DIR__R].s = 0x600;
+		sp->s_fval[WHITE][DIR_DR].s = 0x600;
+	} else if (col == BSZ - 4) {
+		sp->s_fval[BLACK][DIR__R].s = 0x500;
+		sp->s_fval[WHITE][DIR__R].s = 0x500;
+		if (!is_blocked(sp, DIR_DR)) {
+			sp->s_fval[BLACK][DIR_DR].s = 0x500;
+			sp->s_fval[WHITE][DIR_DR].s = 0x500;
 		}
-		sp->s_occ = BORDER;		/* left & right border */
-		sp->s_flg = BFLAGALL;
+	} else {
+		sp->s_fval[BLACK][DIR__R].s = 0x401;
+		sp->s_fval[WHITE][DIR__R].s = 0x401;
+		if (col < 5) {
+			set_blocked(sp, DIR_DL);
+			sp->s_fval[BLACK][DIR_DL].s = 0x600;
+			sp->s_fval[WHITE][DIR_DL].s = 0x600;
+		} else if (col == 5 && !is_blocked(sp, DIR_DL)) {
+			sp->s_fval[BLACK][DIR_DL].s = 0x500;
+			sp->s_fval[WHITE][DIR_DL].s = 0x500;
+		}
+	}
+}
+
+/* Allocate one of the pre-allocated frames for each non-blocked frame. */
+static void
+init_spot_frame(struct spotstr *sp, frame_index *fip)
+{
+
+	for (direction r = 4; r-- > 0; ) {
+		if (is_blocked(sp, r))
+			continue;
+
+		frame_index fi = (*fip)++;
+		sp->s_frame[r] = fi;
+
+		struct combostr *cbp = &frames[fi];
+		cbp->c_combo.s = sp->s_fval[BLACK][r].s;
+		cbp->c_vertex = (spot_index)(sp - board);
+		cbp->c_nframes = 1;
+		cbp->c_dir = r;
+	}
+}
+
+void
+init_board(void)
+{
+
+	game.nmoves = 0;
+	game.win_spot = 0;
+	game.user_x = 1 + (BSZ - 1) / 2;
+	game.user_y = 1 + (BSZ - 1) / 2;
+
+	struct spotstr *sp = board;
+	for (int i = 0; i < 1 + BSZ + 1; i++, sp++) {
+		sp->s_occ = BORDER;	/* bottom border and corners */
+		sp->s_flags = BFLAGALL;
 	}
 
-	/* mark the borders as such */
-	for (i = BSZ1; --i >= 0; sp++) {
-		sp->s_occ = BORDER;		/* bottom border */
-		sp->s_flg = BFLAGALL;
+	/* fill the playing area of the board with EMPTY spots */
+	frame_index fi = 0;
+	memset(frames, 0, sizeof(frames));
+	for (int row = 1; row <= BSZ; row++, sp++) {
+		for (int col = 1; col <= BSZ; col++, sp++) {
+			sp->s_occ = EMPTY;
+			sp->s_wval = 0;
+			init_spot_flags_and_fval(sp, col, row);
+			init_spot_frame(sp, &fi);
+		}
+		sp->s_occ = BORDER;	/* combined left and right border */
+		sp->s_flags = BFLAGALL;
 	}
 
-	sortframes[BLACK] = (struct combostr *)0;
-	sortframes[WHITE] = (struct combostr *)0;
+	for (int i = 0; i < BSZ + 1; i++, sp++) {
+		sp->s_occ = BORDER;	/* top border and top-right corner */
+		sp->s_flags = BFLAGALL;
+	}
+
+	sortframes[BLACK] = NULL;
+	sortframes[WHITE] = NULL;
+
 	init_overlap();
 }
 
 /*
- * Initialize the overlap array.
- * Each entry in the array is a bit mask with eight bits corresponding
+ * Variable names for frames A and B:
+ *
+ * fi	index of the frame in the global 'frames'
+ * d	direction delta, difference between adjacent spot indexes
+ * off	index of the spot in the frame, 0 to 5
+ */
+
+/*
+ * Each entry in the overlap array is a bit mask with eight bits corresponding
  * to whether frame B overlaps frame A (as indexed by overlap[A * FAREA + B]).
- * The eight bits coorespond to whether A and B are open ended (length 6) or
+ *
+ * The eight bits correspond to whether A and B are open-ended (length 6) or
  * closed (length 5).
+ *
  *	0	A closed and B closed
  *	1	A closed and B open
  *	2	A open and B closed
@@ -168,84 +184,101 @@ bdinit(bp)
  *	5	A closed and B open and overlaps in more than one spot
  *	6	A open and B closed and overlaps in more than one spot
  *	7	A open and B open and overlaps in more than one spot
- * As pieces are played, it can make frames not overlap if there are no
- * common open spaces shared between the two frames.
+ *
+ * As pieces are played during the game, frames that no longer share an empty
+ * spot will be removed from the overlap array by setting the entry to 0.
  */
-void
-init_overlap()
+static u_char
+adjust_overlap(u_char ov, int ra, int offa, int rb, int offb, int mask)
 {
-	struct spotstr *sp1, *sp2;
-	struct combostr *cbp;
-	int i, f, r, n, d1, d2;
-	int mask, bmask, vertex, s;
-	u_char *str;
-	short *ip;
+	ov |= (offb == 5) ? mask & 0xA : mask;
+	if (rb != ra)
+		return ov;
+
+	/* compute the multiple spot overlap values */
+	switch (offa) {
+	case 0:
+		if (offb == 4)
+			ov |= 0xA0;
+		else if (offb != 5)
+			ov |= 0xF0;
+		break;
+	case 1:
+		if (offb == 5)
+			ov |= 0xA0;
+		else
+			ov |= 0xF0;
+		break;
+	case 4:
+		if (offb == 0)
+			ov |= 0xC0;
+		else
+			ov |= 0xF0;
+		break;
+	case 5:
+		if (offb == 1)
+			ov |= 0xC0;
+		else if (offb != 0)
+			ov |= 0xF0;
+		break;
+	default:
+		ov |= 0xF0;
+	}
+
+	return ov;
+}
+
+/*
+ * Given a single spot 's' of frame A, update the overlap information for
+ * each frame B that overlaps frame A in that spot.
+ */
+static void
+init_overlap_frame(int fia, int ra, int offa, spot_index s, int mask)
+{
+
+	for (int rb = 4; --rb >= 0;) {
+		int db = dd[rb];
+
+		for (int offb = 0; offb < 6; offb++) {
+			/* spb0 is the spot where frame B starts. */
+			const struct spotstr *spb0 = &board[s - offb * db];
+			if (spb0->s_occ == BORDER)
+				break;
+			if (is_blocked(spb0, rb))
+				continue;
+
+			frame_index fib = spb0->s_frame[rb];
+			intersect[fia * FAREA + fib] = s;
+			u_char *op = &overlap[fia * FAREA + fib];
+			*op = adjust_overlap(*op, ra, offa, rb, offb, mask);
+		}
+	}
+}
+
+static void
+init_overlap(void)
+{
 
 	memset(overlap, 0, sizeof(overlap));
 	memset(intersect, 0, sizeof(intersect));
-	str = &overlap[FAREA * FAREA];
-	ip = &intersect[FAREA * FAREA];
-	for (cbp = frames + FAREA; --cbp >= frames; ) {		/* each frame */
-	    str -= FAREA;
-	    ip -= FAREA;
-	    sp1 = &board[vertex = cbp->c_vertex];
-	    d1 = dd[r = cbp->c_dir];
-	    /*
-	     * s = 5 if closed, 6 if open.
-	     * At this point black & white are the same.
-	     */
-	    s = 5 + sp1->s_fval[BLACK][r].c.b;
-	    /* for each spot in frame A */
-	    for (i = 0; i < s; i++, sp1 += d1, vertex += d1) {
-		/* the sixth spot in frame A only overlaps if it is open */
-		mask = (i == 5) ? 0xC : 0xF;
-		/* for each direction */
-		for (r = 4; --r >= 0; ) {
-		    bmask = BFLAG << r;
-		    sp2 = sp1;
-		    d2 = dd[r];
-		    /* for each frame that intersects at spot sp1 */
-		    for (f = 0; f < 6; f++, sp2 -= d2) {
-			if (sp2->s_occ == BORDER)
-			    break;
-			if (sp2->s_flg & bmask)
-			    continue;
-			n = sp2->s_frame[r] - frames;
-			ip[n] = vertex;
-			str[n] |= (f == 5) ? mask & 0xA : mask;
-			if (r == cbp->c_dir) {
-			    /* compute the multiple spot overlap values */
-			    switch (i) {
-			    case 0:	/* sp1 is the first spot in A */
-				if (f == 4)
-				    str[n] |= 0xA0;
-				else if (f != 5)
-				    str[n] |= 0xF0;
-				break;
-			    case 1:	/* sp1 is the second spot in A */
-				if (f == 5)
-				    str[n] |= 0xA0;
-				else
-				    str[n] |= 0xF0;
-				break;
-			    case 4:	/* sp1 is the penultimate spot in A */
-				if (f == 0)
-				    str[n] |= 0xC0;
-				else
-				    str[n] |= 0xF0;
-				break;
-			    case 5:	/* sp1 is the last spot in A */
-				if (f == 1)
-				    str[n] |= 0xC0;
-				else if (f != 0)
-				    str[n] |= 0xF0;
-				break;
-			    default:
-				str[n] |= 0xF0;
-			    }
-			}
-		    }
+
+	for (int fia = FAREA; fia-- > 0;) {
+		const struct combostr *fa = &frames[fia];
+		spot_index s = fa->c_vertex;
+		u_char ra = fa->c_dir;
+		int da = dd[ra];
+
+		/*
+		 * len = 5 if closed, 6 if open. At this early stage, Black
+		 * and White have the same value for cv_win.
+		 */
+		int len = 5 + board[s].s_fval[BLACK][ra].cv_win;
+
+		for (int offa = 0; offa < len; offa++) {
+			/* spot[5] in frame A only overlaps if it is open */
+			int mask = (offa == 5) ? 0xC : 0xF;
+
+			init_overlap_frame(fia, ra, offa, s + offa * da, mask);
 		}
-	    }
 	}
 }

@@ -1,4 +1,4 @@
-/*	$NetBSD: stoc.c,v 1.8 2004/11/05 21:30:32 dsl Exp $	*/
+/*	$NetBSD: stoc.c,v 1.21 2022/05/29 00:12:11 rillig Exp $	*/
 
 /*
  * Copyright (c) 1994
@@ -33,81 +33,56 @@
  */
 
 #include <sys/cdefs.h>
-#ifndef lint
-#if 0
-static char sccsid[] = "@(#)stoc.c	8.1 (Berkeley) 7/24/94";
-#else
-__RCSID("$NetBSD: stoc.c,v 1.8 2004/11/05 21:30:32 dsl Exp $");
-#endif
-#endif /* not lint */
+/*	@(#)stoc.c	8.1 (Berkeley) 7/24/94	*/
+__RCSID("$NetBSD: stoc.c,v 1.21 2022/05/29 00:12:11 rillig Exp $");
 
 #include <ctype.h>
 #include <stdlib.h>
 #include <string.h>
 #include "gomoku.h"
 
-const char	*letters	= "<ABCDEFGHJKLMNOPQRST>";
+const char	letters[]	= "<ABCDEFGHJKLMNOPQRST>";
 
-struct mvstr {
-	int	m_code;
-	const char	*m_text;
-};
-static	const struct	mvstr	mv[] = {
-	{ RESIGN,	"resign" }, 
-	{ RESIGN,	"quit" },
-	{ SAVE,		"save" },
-	{ -1,		0 }
-};
 
 /*
  * Turn the spot number form of a move into the character form.
  */
 const char *
-g_stoc(s)
-	int s;
+stoc(spot_index s)
 {
 	static char buf[32];
-	int i;
 
-	for (i = 0; mv[i].m_code >= 0; i++)
-		if (s == mv[i].m_code)
-			return(mv[i].m_text);
-	sprintf(buf, "%c%d", letters[s % BSZ1], s / BSZ1);
-	return(buf);
+	if (s == RESIGN)
+		return "resign";
+	if (s == SAVE)
+		return "save";
+	snprintf(buf, sizeof(buf), "%c%d",
+	    letters[s % (BSZ + 1)], s / (BSZ + 1));
+	return buf;
 }
 
 /*
  * Turn the character form of a move into the spot number form.
  */
-int
-g_ctos(mp)
-	const char *mp;
+spot_index
+ctos(const char *mp)
 {
-	int i;
 
-	for (i = 0; mv[i].m_code >= 0; i++)
-		if (strcmp(mp, mv[i].m_text) == 0)
-			return(mv[i].m_code);
-	if (!isalpha((unsigned char)mp[0]))
-		return(ILLEGAL);
-	i = atoi(&mp[1]);
-	if (i < 1 || i > 19)
-		return(ILLEGAL);
-	return(PT(g_lton(mp[0]), i));
-}
+	if (strcmp(mp, "resign") == 0 || strcmp(mp, "quit") == 0)
+		return RESIGN;
+	if (strcmp(mp, "save") == 0)
+		return SAVE;
 
-/*
- * Turn a letter into a number.
- */
-int
-g_lton(c)
-	int c;
-{
-	int i;
+	int letter = toupper((unsigned char)mp[0]);
+	int x = 1;
+	while (x <= BSZ && letters[x] != letter)
+		x++;
+	if (x > BSZ)
+		return ILLEGAL;
 
-	if (islower(c))
-		c = toupper(c);
-	for (i = 1; i <= BSZ && letters[i] != c; i++)
-		;
-	return(i);
+	int y = atoi(&mp[1]);
+	if (y < 1 || y > 19)
+		return ILLEGAL;
+
+	return PT(x, y);
 }

@@ -62,7 +62,7 @@ instructions(void)
 		    strerror(errno));
 		exit(1);
 	}
-	switch (pid = vfork()) {
+	switch (pid = fork()) {
 	case -1:
 		fprintf(stderr, "cribbage: %s.\n", strerror(errno));
 		exit(1);

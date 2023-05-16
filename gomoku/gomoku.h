@@ -1,4 +1,4 @@
-/*	$NetBSD: gomoku.h,v 1.10 2004/01/27 20:30:29 jsm Exp $	*/
+/*	$NetBSD: gomoku.h,v 1.56 2022/06/19 10:23:48 rillig Exp $	*/
 
 /*
  * Copyright (c) 1994
@@ -35,71 +35,79 @@
  */
 
 #include <sys/types.h>
-#include <sys/param.h>
+#include <stdbool.h>
 #include <stdio.h>
 
-/* board dimensions */
+/*
+ * The gomoku 'board' mainly consists of the playing area of BSZ x BSZ spots.
+ * The playing area uses 1-based coordinates. Around the playing area is a
+ * rectangle of border spots, to avoid having to check the coordinates when
+ * calculating spot coordinates. The left and right border overlap, to save a
+ * few bytes.
+ */
+
 #define BSZ	19
-#define BSZ1	(BSZ+1)
-#define BSZ2	(BSZ+2)
-#define BAREA	(BSZ2*BSZ1+1)
+#define BAREA	((1 + BSZ + 1) * (BSZ + 1) + 1)
 
-/* frame dimentions (based on 5 in a row) */
-#define FSZ1	BSZ
-#define FSZ2	(BSZ-4)
-#define FAREA	(FSZ1*FSZ2 + FSZ2*FSZ2 + FSZ1*FSZ2 + FSZ2*FSZ2)
+/*
+ * A 'frame' is a group of five or six contiguous spots on the board. An
+ * open-ended frame is one with spaces on both ends; otherwise, it is closed.
+ */
+#define FAREA	(2 * BSZ * (BSZ - 4) + 2 * (BSZ - 4) * (BSZ - 4))
 
-#define MUP	(BSZ1)
-#define MDOWN	(-BSZ1)
-#define MLEFT	(-1)
-#define MRIGHT	(1)
 
-/* values for s_occ */
+/* The content of a spot on the board; used in s_occ. */
 #define BLACK	0
 #define WHITE	1
 #define EMPTY	2
 #define BORDER	3
 
-/* return values for makemove() */
+/* Either BLACK or WHITE. */
+typedef unsigned char player_color;
+
+/* A spot on the board, or one of the special values below. */
+typedef unsigned short spot_index;
+#define PT(x, y)	((x) + (BSZ + 1) * (y))
+/* return values for makemove, readinput */
 #define MOVEOK	0
 #define RESIGN	1
 #define ILLEGAL	2
 #define WIN	3
 #define TIE	4
 #define SAVE	5
-
-#define A 1
-#define B 2
-#define C 3
-#define D 4
-#define E 5
-#define F 6
-#define G 7
-#define H 8
-#define J 9
-#define K 10
-#define L 11
-#define M 12
-#define N 13
-#define O 14
-#define P 15
-#define Q 16
-#define R 17
-#define S 18
-#define T 19
-
-#define PT(x,y)		((x) + BSZ1 * (y))
+#define END_OF_INPUT 6
 
 /*
- * A 'frame' is a group of five or six contiguous board locations.
- * An open ended frame is one with spaces on both ends; otherwise, its closed.
- * A 'combo' is a group of intersecting frames and consists of two numbers:
- * 'A' is the number of moves to make the combo non-blockable.
- * 'B' is the minimum number of moves needed to win once it can't be blocked.
- * A 'force' is a combo that is one move away from being non-blockable
+ * A 'combo' is a group of intersecting or overlapping frames and consists of
+ * two numbers:
+ * 'F' is the number of moves still needed to make the combo non-blockable.
+ * 'W' is the minimum number of moves needed to win once it can't be blocked.
  *
+ * A 'force' is a combo that is one move away from being non-blockable.
+ *
+ * Each time a frame is added to the combo, the number of moves to complete
+ * the force is the number of moves needed to 'fill' the frame plus one at
+ * the intersection point. The number of moves to win is the number of moves
+ * to complete the best frame minus the last move to complete the force.
+ * Note that it doesn't make sense to combine a <1,x> with anything since
+ * it is already a force. Also, the frames have to be independent so a
+ * single move doesn't affect more than one frame making up the combo.
+ *
+ * Rules for comparing which of two combos (<F1,W1> <F2,W2>) is better:
+ * Both the same color:
+ *	<F',W'> = (F1 < F2 || F1 == F2 && W1 <= W2) ? <F1,W1> : <F2,W2>
+ *	We want to complete the force first, then the combo with the
+ *	fewest moves to win.
+ * Different colors, <F1,W1> is the combo for the player with the next move:
+ *	<F',W'> = F2 <= 1 && (F1 > 1 || F2 + W2 < F1 + W1) ? <F2,W2> : <F1,W1>
+ *	We want to block only if we have to (i.e., if they are one move away
+ *	from completing a force, and we don't have a force that we can
+ *	complete which takes fewer or the same number of moves to win).
+ */
+
+/*
  * Single frame combo values:
- *     <A,B>	board values
+ *     <F,W>	board values
  *	5,0	. . . . . O
  *	4,1	. . . . . .
  *	4,0	. . . . X O
@@ -112,47 +120,26 @@
  *	0,1	. X X X X .
  *	0,0	X X X X X O
  *
- * The rule for combining two combos (<A1,B1> <A2,B2>)
- * with V valid intersection points, is:
- *	A' = A1 + A2 - 2 - V
- *	B' = MIN(A1 + B1 - 1, A2 + B2 - 1)
- * Each time a frame is added to the combo, the number of moves to complete
- * the force is the number of moves needed to 'fill' the frame plus one at
- * the intersection point. The number of moves to win is the number of moves
- * to complete the best frame minus the last move to complete the force.
- * Note that it doesn't make sense to combine a <1,x> with anything since
- * it is already a force. Also, the frames have to be independent so a
- * single move doesn't affect more than one frame making up the combo.
- *
- * Rules for comparing which of two combos (<A1,B1> <A2,B2>) is better:
- * Both the same color:
- *	<A',B'> = (A1 < A2 || A1 == A2 && B1 <= B2) ? <A1,B1> : <A2,B2>
- *	We want to complete the force first, then the combo with the
- *	fewest moves to win.
- * Different colors, <A1,B1> is the combo for the player with the next move:
- *	<A',B'> = A2 <= 1 && (A1 > 1 || A2 + B2 < A1 + B1) ? <A2,B2> : <A1,B1>
- *	We want to block only if we have to (i.e., if they are one move away
- *	from completing a force and we don't have a force that we can
- *	complete which takes fewer or the same number of moves to win).
+ * The rule for combining two combos (<F1,W1> <F2,W2>) with V valid
+ * intersection points is:
+ *	F' = F1 + F2 - 2 - V
+ *	W' = MIN(F1 + W1 - 1, F2 + W2 - 1)
  */
-
-#define MAXA		6
-#define MAXB		2
-#define MAXCOMBO	0x600
-
-union	comboval {
+union comboval {
 	struct {
 #if BYTE_ORDER == BIG_ENDIAN
-		u_char	a;	/* # moves to complete force */
-		u_char	b;	/* # moves to win */
+		u_char	a;
+		u_char	b;
 #endif
 #if BYTE_ORDER == LITTLE_ENDIAN
-		u_char	b;	/* # moves to win */
-		u_char	a;	/* # moves to complete force */
+		u_char	b;
+		u_char	a;
 #endif
 	} c;
 	u_short	s;
 };
+#define cv_force	c.a	/* # moves to complete force */
+#define cv_win		c.b	/* # moves to win */
 
 /*
  * This structure is used to record information about single frames (F) and
@@ -169,25 +156,29 @@ union	comboval {
 struct combostr {
 	struct combostr	*c_next;	/* list of combos at the same level */
 	struct combostr	*c_prev;	/* list of combos at the same level */
-	struct combostr	*c_link[2];	/* C:previous level or F:NULL */
-	union comboval	c_linkv[2];	/* C:combo value for link[0,1] */
-	union comboval	c_combo;	/* C:combo value for this level */
-	u_short		c_vertex;	/* C:intersection or F:frame head */
-	u_char		c_nframes;	/* number of frames in the combo */
-	u_char		c_dir;		/* C:loop frame or F:frame direction */
-	u_char		c_flg;		/* C:combo flags */
-	u_char		c_frameindex;	/* C:intersection frame index */
+	struct combostr	*c_link[2];	/* F: NULL,
+					 * C: previous level */
+	union comboval	c_linkv[2];	/* C: combo value for link[0, 1] */
+	union comboval	c_combo;	/* F: initial combo value (read-only),
+					 * C: combo value for this level */
+	spot_index	c_vertex;	/* F: frame head,
+					 * C: intersection */
+	u_char		c_nframes;	/* F: 1,
+					 * C: number of frames in the combo */
+	u_char		c_dir;		/* F: frame direction,
+					 * C: loop frame */
+	u_char		c_flags;	/* C: combo flags */
+	u_char		c_frameindex;	/* C: intersection frame index */
 	u_char		c_framecnt[2];	/* number of frames left to attach */
-	u_char		c_emask[2];	/* C:bit mask of completion spots for
+	u_char		c_emask[2];	/* C: bit mask of completion spots for
 					 * link[0] and link[1] */
-	u_char		c_voff[2];	/* C:vertex offset within frame */
+	u_char		c_voff[2];	/* C: vertex offset within frame */
 };
 
-/* flag values for c_flg */
-#define C_OPEN_0	0x01		/* link[0] is an open ended frame */
-#define C_OPEN_1	0x02		/* link[1] is an open ended frame */
+/* flag values for c_flags */
+#define C_OPEN_0	0x01		/* link[0] is an open-ended frame */
+#define C_OPEN_1	0x02		/* link[1] is an open-ended frame */
 #define C_LOOP		0x04		/* link[1] intersects previous frame */
-#define C_MARK		0x08		/* indicates combo processed */
 
 /*
  * This structure is used for recording the completion points of
@@ -203,26 +194,35 @@ struct	elist {
 	union comboval	e_fval;		/* frame combo value */
 };
 
+/* The index of a frame in the global 'frames'. */
+typedef unsigned short frame_index;
+
+/* 0 = right, 1 = down right, 2 = down, 3 = down left. */
+typedef unsigned char direction;
+#define DIR__R		0		/* right */
+#define DIR_DR		1		/* down right */
+#define DIR_D_		2		/* down */
+#define DIR_DL		3		/* down left */
+
 /*
  * One spot structure for each location on the board.
- * A frame consists of the combination for the current spot plus the five spots
- * 0: right, 1: right & down, 2: down, 3: down & left.
+ * A frame consists of the combination for the current spot plus the next
+ * five spots in the direction.
  */
 struct	spotstr {
 	short		s_occ;		/* color of occupant */
 	short		s_wval;		/* weighted value */
-	int		s_flg;		/* flags for graph walks */
-	struct combostr	*s_frame[4];	/* level 1 combo for frame[dir] */
-	union comboval	s_fval[2][4];	/* combo value for [color][frame] */
-	union comboval	s_combo[2];	/* minimum combo value for BLK & WHT */
+	int		s_flags;	/* flags for graph walks */
+	frame_index	s_frame[4];	/* level 1 combo for [dir] */
+	union comboval	s_fval[2][4];	/* combo value for [color][dir] */
+	union comboval	s_combo[2];	/* minimum combo value for [color] */
 	u_char		s_level[2];	/* number of frames in the min combo */
 	u_char		s_nforce[2];	/* number of <1,x> combos */
 	struct elist	*s_empty;	/* level n combo completion spots */
 	struct elist	*s_nempty;	/* level n+1 combo completion spots */
-	int		dummy[2];	/* XXX */
 };
 
-/* flag values for s_flg */
+/* flag values for s_flags */
 #define CFLAG		0x000001	/* frame is part of a combo */
 #define CFLAGALL	0x00000F	/* all frame directions marked */
 #define IFLAG		0x000010	/* legal intersection point */
@@ -234,36 +234,46 @@ struct	spotstr {
 #define BFLAG		0x010000	/* frame intersects border or dead */
 #define BFLAGALL	0x0F0000	/* all frames dead */
 
-/*
- * This structure is used to store overlap information between frames.
- */
-struct	ovlp_info {
-	int		o_intersect;	/* intersection spot */
-	struct combostr	*o_fcombo;	/* the connecting combo */
-	u_char		o_link;		/* which link to update (0 or 1) */
-	u_char		o_off;		/* offset in frame of intersection */
-	u_char		o_frameindex;	/* intersection frame index */
+static inline bool
+is_blocked(const struct spotstr *sp, direction r)
+{
+	return (sp->s_flags & (BFLAG << r)) != 0;
+}
+
+static inline void
+set_blocked(struct spotstr *sp, direction r)
+{
+	sp->s_flags |= BFLAG << r;
+}
+
+struct game {
+	unsigned int	nmoves;		/* number of played moves */
+	spot_index	moves[BSZ * BSZ]; /* log of all played moves */
+	spot_index	win_spot;	/* the winning move, or 0 */
+	direction	win_dir;
+	int		user_x;
+	int		user_y;
 };
 
-extern	const char	*letters;
-extern	char	fmtbuf[];
+extern	const char	letters[];
 extern	const char	pdir[];
 
 extern	const int     dd[4];
 extern	struct	spotstr	board[BAREA];		/* info for board */
 extern	struct	combostr frames[FAREA];		/* storage for single frames */
 extern	struct	combostr *sortframes[2];	/* sorted, non-empty frames */
-extern	u_char	overlap[FAREA * FAREA];		/* frame [a][b] overlap */
-extern	short	intersect[FAREA * FAREA];	/* frame [a][b] intersection */
-extern	int	movelog[BSZ * BSZ];		/* history of moves */
-extern	int	movenum;
+extern	u_char	overlap[FAREA * FAREA];
+extern	spot_index intersect[FAREA * FAREA];	/* frame [a][b] intersection */
+extern	struct game	game;
 extern	int	debug;
 
-#define ASSERT(x)
+extern bool interactive;
+extern const char *plyr[];
 
-void	bdinit(struct spotstr *);
-void	init_overlap(void);
-int 	g_getline(char *, int);
+void	init_board(void);
+spot_index get_coord(void);
+int	get_key(const char *);
+bool	get_line(char *, int, void (*)(const char *));
 void	ask(const char *);
 void	dislog(const char *);
 void	bdump(FILE *);
@@ -271,32 +281,16 @@ void	bdisp(void);
 void	bdisp_init(void);
 void	cursfini(void);
 void	cursinit(void);
-void	bdwho(int);
-void	panic(const char *) __attribute__((__noreturn__));
-void	glog(const char *);
-void	dlog(const char *);
-void	quit(void) __attribute__((__noreturn__));
-void	quitsig(int) __attribute__((__noreturn__));
+void	bdwho(void);
+void	panic(const char *, ...) __printflike(1, 2) __dead;
+void	debuglog(const char *, ...) __printflike(1, 2);
 void	whatsup(int);
-int	readinput(FILE *);
-const char   *g_stoc(int);
-int	g_lton(int);
-int	g_ctos(const char *);
-void	update_overlap(struct spotstr *);
-int	makemove(int, int);
-int	list_eq(struct combostr **, struct combostr **, int);
+const char *stoc(spot_index);
+spot_index ctos(const char *);
+int	makemove(player_color, spot_index);
 void	clearcombo(struct combostr *, int);
-void	makeempty(struct combostr *);
-void	appendcombo(struct combostr *, int);
-void	updatecombo(struct combostr *, int);
 void	markcombo(struct combostr *);
-void	printcombo(struct combostr *, char *);
-void	makecombo(struct combostr *, struct spotstr *, int, int);
-void	makecombo2(struct combostr *, struct spotstr *, int, int);
-int	sortcombo(struct combostr **, struct combostr **, struct combostr *);
-int	checkframes(struct combostr *, struct combostr *, struct spotstr *,
-		    int, struct ovlp_info *);
-void	addframes(int);
-void	scanframes(int);
-int	better(const struct spotstr *, const struct spotstr *, int);
-int	pickmove(int);
+spot_index pickmove(player_color);
+#if defined(DEBUG)
+void	printcombo(struct combostr *, char *, size_t);
+#endif

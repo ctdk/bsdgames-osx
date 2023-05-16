@@ -1,4 +1,4 @@
-/*	$NetBSD: bdisp.c,v 1.8 2003/08/07 09:37:16 agc Exp $	*/
+/*	$NetBSD: bdisp.c,v 1.55 2022/05/29 17:01:42 rillig Exp $	*/
 
 /*
  * Copyright (c) 1994
@@ -33,51 +33,60 @@
  */
 
 #include <sys/cdefs.h>
-#ifndef lint
-#if 0
-static char sccsid[] = "@(#)bdisp.c	8.2 (Berkeley) 5/3/95";
-#else
-__RCSID("$NetBSD: bdisp.c,v 1.8 2003/08/07 09:37:16 agc Exp $");
-#endif
-#endif /* not lint */
+/*	@(#)bdisp.c	8.2 (Berkeley) 5/3/95	*/
+__RCSID("$NetBSD: bdisp.c,v 1.55 2022/05/29 17:01:42 rillig Exp $");
 
 #include <curses.h>
 #include <string.h>
+#include <stdlib.h>
+#include <err.h>
 #include "gomoku.h"
 
 #define	SCRNH		24		/* assume 24 lines for the moment */
 #define	SCRNW		80		/* assume 80 chars for the moment */
 
 static	int	lastline;
-static	char	pcolor[] = "*O.?";
+static	const char pcolor[] = "*O.?";
 
-extern int interactive;
-extern char *plyr[];
+#define	scr_y(by)	(1 + (BSZ - 1) - ((by) - 1))
+#define	scr_x(bx)	(3 + 2 * ((bx) - 1))
+
+#define TRANSCRIPT_COL	(3 + (2 * BSZ - 1) + 3 + 3)
 
 /*
  * Initialize screen display.
  */
 void
-cursinit()
+cursinit(void)
 {
 
-	initscr();
+	if (initscr() == NULL)
+		errx(EXIT_FAILURE, "Couldn't initialize screen");
+
+	if (LINES < SCRNH || COLS < SCRNW)
+		errx(EXIT_FAILURE, "Screen too small (need %dx%d)",
+		    SCRNW, SCRNH);
+
+	keypad(stdscr, true);
+	nonl();
 	noecho();
 	cbreak();
-	leaveok(stdscr, TRUE);
+	leaveok(stdscr, false);
+
+	mousemask(BUTTON1_CLICKED, NULL);
 }
 
 /*
  * Restore screen display.
  */
 void
-cursfini()
+cursfini(void)
 {
 
-	leaveok(stdscr, FALSE);
-	move(23, 0);
+	move(BSZ + 4, 0);
 	clrtoeol();
 	refresh();
+	echo();
 	endwin();
 }
 
@@ -85,30 +94,23 @@ cursfini()
  * Initialize board display.
  */
 void
-bdisp_init()
+bdisp_init(void)
 {
-	int i, j;
 
-	/* top border */
-	for (i = 1; i < BSZ1; i++) {
-		move(0, 2 * i + 1);
-		addch(letters[i]);
+	/* top and bottom borders */
+	for (int col = 1; col <= BSZ; col++) {
+		mvaddch(scr_y(BSZ + 1), scr_x(col), letters[col]);
+		mvaddch(scr_y(0), scr_x(col), letters[col]);
 	}
+
 	/* left and right edges */
-	for (j = BSZ1; --j > 0; ) {
-		move(20 - j, 0);
-		printw("%2d ", j);
-		move(20 - j, 2 * BSZ1 + 1);
-		printw("%d ", j);
+	for (int row = BSZ; row >= 1; row--) {
+		mvprintw(scr_y(row), 0, "%2d", row);
+		mvprintw(scr_y(row), scr_x(BSZ) + 2, "%d", row);
 	}
-	/* bottom border */
-	for (i = 1; i < BSZ1; i++) {
-		move(20, 2 * i + 1);
-		addch(letters[i]);
-	}
-	bdwho(0);
-	move(0, 47);
-	addstr("#  black  white");
+
+	bdwho();
+	mvaddstr(0, TRANSCRIPT_COL, "  #  black  white");
 	lastline = 0;
 	bdisp();
 }
@@ -117,48 +119,77 @@ bdisp_init()
  * Update who is playing whom.
  */
 void
-bdwho(update)
-	int update;
+bdwho(void)
 {
-	int i;
+	int bw = (int)strlen(plyr[BLACK]);
+	int ww = (int)strlen(plyr[WHITE]);
+	int available = 3 + (1 + scr_x(BSZ) - scr_x(1)) + 3;
+	int fixed = (int)sizeof("BLACK/ (*) vs. WHITE/ (O)") - 1;
+	int total = fixed + bw + ww;
+	int x;
 
-	move(21, 0);
-	clrtoeol();
-	i = 6 - strlen(plyr[BLACK]) / 2;
-	move(21, i > 0 ? i : 0);
-	printw("BLACK/%s", plyr[BLACK]);
-	i = 30 - strlen(plyr[WHITE]) / 2;
-	move(21, i);
-	printw("WHITE/%s", plyr[WHITE]);
-	move(21, 19);
-	addstr(" vs. ");
-	if (update)
-		refresh();
+	if (total <= available)
+		x = (available - total) / 2;
+	else {
+		int remaining = available - fixed;
+		int half = remaining / 2;
+
+		if (bw <= half)
+			ww = remaining - bw;
+		else if (ww <= half)
+			bw = remaining - ww;
+		else
+			bw = half, ww = remaining - half;
+		x = 0;
+	}
+
+	mvhline(BSZ + 2, 0, ' ', available);
+	mvprintw(BSZ + 2, x, "BLACK/%.*s (*) vs. WHITE/%.*s (O)",
+	    bw, plyr[BLACK], ww, plyr[WHITE]);
+}
+
+static bool
+should_highlight(spot_index s)
+{
+
+	if (game.nmoves > 0 && game.moves[game.nmoves - 1] == s)
+		return true;
+	if (game.win_spot != 0)
+		for (int off = 0; off < 5; off++)
+			if (s == game.win_spot + off * dd[game.win_dir])
+				return true;
+	return false;
 }
 
 /*
  * Update the board display after a move.
  */
 void
-bdisp()
+bdisp(void)
 {
-	int i, j, c;
 	struct spotstr *sp;
 
-	for (j = BSZ1; --j > 0; ) {
-		for (i = 1; i < BSZ1; i++) {
-			move(BSZ1 - j, 2 * i + 1);
-			sp = &board[i + j * BSZ1];
+	for (int row = BSZ + 1; --row > 0; ) {
+		for (int col = 1; col <= BSZ; col++) {
+			sp = &board[PT(col, row)];
+			char c;
 			if (debug > 1 && sp->s_occ == EMPTY) {
-				if (sp->s_flg & IFLAGALL)
+				if ((sp->s_flags & IFLAGALL) != 0)
 					c = '+';
-				else if (sp->s_flg & CFLAGALL)
+				else if ((sp->s_flags & CFLAGALL) != 0)
 					c = '-';
 				else
 					c = '.';
 			} else
 				c = pcolor[sp->s_occ];
-			addch(c);
+
+			move(scr_y(row), scr_x(col));
+			if (should_highlight(PT(col, row))) {
+				attron(A_BOLD);
+				addch(c);
+				attroff(A_BOLD);
+			} else
+				addch(c);
 		}
 	}
 	refresh();
@@ -169,24 +200,23 @@ bdisp()
  * Dump board display to a file.
  */
 void
-bdump(fp)
-	FILE *fp;
+bdump(FILE *fp)
 {
-	int i, j, c;
+	int c;
 	struct spotstr *sp;
 
 	/* top border */
 	fprintf(fp, "   A B C D E F G H J K L M N O P Q R S T\n");
 
-	for (j = BSZ1; --j > 0; ) {
-		/* left edge */
-		fprintf(fp, "%2d ", j);
-		for (i = 1; i < BSZ1; i++) {
-			sp = &board[i + j * BSZ1];
+	for (int row = BSZ + 1; --row > 0; ) {
+		fprintf(fp, "%2d ", row);	/* left edge */
+
+		for (int col = 1; col <= BSZ; col++) {
+			sp = &board[PT(col, row)];
 			if (debug > 1 && sp->s_occ == EMPTY) {
-				if (sp->s_flg & IFLAGALL)
+				if ((sp->s_flags & IFLAGALL) != 0)
 					c = '+';
-				else if (sp->s_flg & CFLAGALL)
+				else if ((sp->s_flags & CFLAGALL) != 0)
 					c = '-';
 				else
 					c = '.';
@@ -195,8 +225,8 @@ bdump(fp)
 			putc(c, fp);
 			putc(' ', fp);
 		}
-		/* right edge */
-		fprintf(fp, "%d\n", j);
+
+		fprintf(fp, "%d\n", row);	/* right edge */
 	}
 
 	/* bottom border */
@@ -208,81 +238,229 @@ bdump(fp)
  * Display a transcript entry
  */
 void
-dislog(str)
-	const char *str;
+dislog(const char *str)
 {
 
 	if (++lastline >= SCRNH - 1) {
 		/* move 'em up */
 		lastline = 1;
 	}
-	move(lastline, 46);
-	addnstr(str, SCRNW - 46 - 1);
+	mvaddnstr(lastline, TRANSCRIPT_COL, str, SCRNW - TRANSCRIPT_COL - 1);
 	clrtoeol();
-	move(lastline + 1, 46);
+	move(lastline + 1, TRANSCRIPT_COL);
 	clrtoeol();
 }
 
 /*
  * Display a question.
  */
-
 void
-ask(str)
-	const char *str;
+ask(const char *str)
 {
-	int len = strlen(str);
+	int len = (int)strlen(str);
 
-	move(23, 0);
-	addstr(str);
+	mvaddstr(BSZ + 4, 0, str);
 	clrtoeol();
-	move(23, len);
+	move(BSZ + 4, len);
 	refresh();
 }
 
 int
-g_getline(buf, size)
-	char *buf;
-	int size;
+get_key(const char *allowed)
+{
+
+	for (;;) {
+		int ch = getch();
+		if (allowed == NULL || ch == '\0' ||
+		    strchr(allowed, ch) != NULL)
+			return ch;
+		beep();
+		refresh();
+	}
+}
+
+bool
+get_line(char *buf, int size, void (*on_change)(const char *))
 {
 	char *cp, *end;
 	int c;
 
-	c = 0;
 	cp = buf;
 	end = buf + size - 1;	/* save room for the '\0' */
-	while (cp < end && (c = getchar()) != EOF && c != '\n' && c != '\r') {
-		*cp++ = c;
-		if (interactive) {
-			switch (c) {
-			case 0x0c: /* ^L */
-				wrefresh(curscr);
-				cp--;
-				continue;
-			case 0x15: /* ^U */
-			case 0x18: /* ^X */
-				while (cp > buf) {
-					cp--;
-					addch('\b');
-				}
-				clrtoeol();
-				break;
-			case '\b':
-			case 0x7f: /* DEL */
-				if (cp == buf + 1) {
-					cp--;
-					continue;
-				}
-				cp -= 2;
-				addch('\b');
-				c = ' ';
-				/* FALLTHROUGH */
-			default:
-				addch(c);
-			}
-			refresh();
+	while ((c = getchar()) != EOF && c != '\n' && c != '\r') {
+		if (!interactive && cp < end) {
+			*cp++ = c;
+			continue;
 		}
+		if (!interactive)
+			errx(EXIT_FAILURE, "line too long");
+
+		switch (c) {
+		case 0x0c:	/* ^L */
+			wrefresh(curscr);
+			continue;
+		case 0x15:	/* ^U */
+		case 0x18:	/* ^X */
+			for (; cp > buf; cp--)
+				addstr("\b \b");
+			break;
+		case '\b':
+		case 0x7f:	/* DEL */
+			if (cp == buf)
+				continue;
+			cp--;
+			addstr("\b \b");
+			break;
+		default:
+			if (cp < end) {
+				*cp++ = c;
+				addch(c);
+			} else
+				beep();
+		}
+		if (on_change != NULL) {
+			*cp = '\0';
+			on_change(buf);
+		}
+		refresh();
 	}
 	*cp = '\0';
-	return(c != EOF);
+	return c != EOF;
+}
+
+static bool
+get_coord_mouse(int *x, int *y)
+{
+	MEVENT ev;
+
+	if (getmouse(&ev) == OK &&
+	    (ev.bstate & (BUTTON1_RELEASED | BUTTON1_CLICKED)) != 0 &&
+	    ev.y >= scr_y(BSZ) && ev.y <= scr_y(1) &&
+	    ev.x >= scr_x(1) && ev.x <= scr_x(BSZ) &&
+	    (ev.x - scr_x(1)) % (scr_x(2) - scr_x(1)) == 0) {
+		*x = 1 + (ev.x - scr_x(1)) / (scr_x(2) - scr_x(1));
+		*y = 1 + (scr_y(1) - ev.y) / (scr_y(1) - scr_y(2));
+		return true;
+	}
+	return false;
+}
+
+/*
+ * Ask the user for the coordinate of a move, or return RESIGN or SAVE.
+ *
+ * Based on Eric S. Raymond's modifications to the battleship (bs) user
+ * interface.
+ */
+spot_index
+get_coord(void)
+{
+	int x = game.user_x, y = game.user_y;
+
+	move(scr_y(y), scr_x(x));
+	refresh();
+	for (;;) {
+		mvprintw(BSZ + 3, 6, "(%c %d) ", letters[x], y);
+		move(scr_y(y), scr_x(x));
+
+		int ch = getch();
+		switch (ch) {
+		case 'k':
+		case '8':
+		case KEY_UP:
+			y++;
+			break;
+		case 'j':
+		case '2':
+		case KEY_DOWN:
+			y--;
+			break;
+		case 'h':
+		case '4':
+		case KEY_LEFT:
+			x--;
+			break;
+		case 'l':
+		case '6':
+		case KEY_RIGHT:
+			x++;
+			break;
+		case 'y':
+		case '7':
+		case KEY_A1:
+			x--;
+			y++;
+			break;
+		case 'b':
+		case '1':
+		case KEY_C1:
+			x--;
+			y--;
+			break;
+		case 'u':
+		case '9':
+		case KEY_A3:
+			x++;
+			y++;
+			break;
+		case 'n':
+		case '3':
+		case KEY_C3:
+			x++;
+			y--;
+			break;
+		case 'K':
+			y += 5;
+			break;
+		case 'J':
+			y -= 5;
+			break;
+		case 'H':
+			x -= 5;
+			break;
+		case 'L':
+			x += 5;
+			break;
+		case 'Y':
+			x -= 5;
+			y += 5;
+			break;
+		case 'B':
+			x -= 5;
+			y -= 5;
+			break;
+		case 'U':
+			x += 5;
+			y += 5;
+			break;
+		case 'N':
+			x += 5;
+			y -= 5;
+			break;
+		case 0x0c:	/* ^L */
+			(void)clearok(stdscr, true);
+			(void)refresh();
+			break;
+		case KEY_MOUSE:
+			if (get_coord_mouse(&x, &y))
+				goto selected;
+			beep();
+			break;
+		case 'Q':
+		case 'q':
+			return RESIGN;
+		case 'S':
+		case 's':
+			return SAVE;
+		case ' ':
+		case '\r':
+		selected:
+			(void)mvhline(BSZ + 3, 6, ' ', 6);
+			game.user_x = x;
+			game.user_y = y;
+			return PT(x, y);
+		}
+
+		x = 1 + (x + BSZ - 1) % BSZ;
+		y = 1 + (y + BSZ - 1) % BSZ;
+	}
 }
