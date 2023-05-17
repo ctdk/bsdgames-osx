@@ -1,4 +1,4 @@
-/*	$NetBSD: stoc.c,v 1.21 2022/05/29 00:12:11 rillig Exp $	*/
+/*	$NetBSD: stoc.c,v 1.12 2009/08/12 06:19:17 dholland Exp $	*/
 
 /*
  * Copyright (c) 1994
@@ -30,59 +30,77 @@
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
+ *
+ *	@(#)stoc.c	8.1 (Berkeley) 7/24/94
  */
-
-#include <sys/cdefs.h>
-/*	@(#)stoc.c	8.1 (Berkeley) 7/24/94	*/
-__RCSID("$NetBSD: stoc.c,v 1.21 2022/05/29 00:12:11 rillig Exp $");
 
 #include <ctype.h>
 #include <stdlib.h>
 #include <string.h>
 #include "gomoku.h"
 
-const char	letters[]	= "<ABCDEFGHJKLMNOPQRST>";
+const char	*letters	= "<ABCDEFGHJKLMNOPQRST>";
+
+struct mvstr {
+	int	m_code;
+	const char	*m_text;
+};
+static	const struct	mvstr	mv[] = {
+	{ RESIGN,	"resign" }, 
+	{ RESIGN,	"quit" },
+	{ SAVE,		"save" },
+	{ -1,		0 }
+};
+
+static int lton(int);
 
 
 /*
  * Turn the spot number form of a move into the character form.
  */
 const char *
-stoc(spot_index s)
+cvrt_stoc(int s)
 {
 	static char buf[32];
+	int i;
 
-	if (s == RESIGN)
-		return "resign";
-	if (s == SAVE)
-		return "save";
-	snprintf(buf, sizeof(buf), "%c%d",
-	    letters[s % (BSZ + 1)], s / (BSZ + 1));
-	return buf;
+	for (i = 0; mv[i].m_code >= 0; i++)
+		if (s == mv[i].m_code)
+			return(mv[i].m_text);
+	snprintf(buf, sizeof(buf), "%c%d", letters[s % BSZ1], s / BSZ1);
+	return(buf);
 }
 
 /*
  * Turn the character form of a move into the spot number form.
  */
-spot_index
-ctos(const char *mp)
+int
+cvrt_ctos(const char *mp)
 {
+	int i;
 
-	if (strcmp(mp, "resign") == 0 || strcmp(mp, "quit") == 0)
-		return RESIGN;
-	if (strcmp(mp, "save") == 0)
-		return SAVE;
+	for (i = 0; mv[i].m_code >= 0; i++)
+		if (strcmp(mp, mv[i].m_text) == 0)
+			return(mv[i].m_code);
+	if (!isalpha((unsigned char)mp[0]))
+		return(ILLEGAL);
+	i = atoi(&mp[1]);
+	if (i < 1 || i > 19)
+		return(ILLEGAL);
+	return(PT(lton((unsigned char)mp[0]), i));
+}
 
-	int letter = toupper((unsigned char)mp[0]);
-	int x = 1;
-	while (x <= BSZ && letters[x] != letter)
-		x++;
-	if (x > BSZ)
-		return ILLEGAL;
+/*
+ * Turn a letter into a number.
+ */
+static int
+lton(int c)
+{
+	int i;
 
-	int y = atoi(&mp[1]);
-	if (y < 1 || y > 19)
-		return ILLEGAL;
-
-	return PT(x, y);
+	if (islower(c))
+		c = toupper(c);
+	for (i = 1; i <= BSZ && letters[i] != c; i++)
+		;
+	return(i);
 }

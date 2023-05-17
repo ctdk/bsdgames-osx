@@ -1,4 +1,4 @@
-.\"	$NetBSD: gomoku.6,v 1.10 2003/08/07 09:37:17 agc Exp $
+.\"	$NetBSD: gomoku.6,v 1.15 2010/03/29 04:00:03 dholland Exp $
 .\"
 .\" Copyright (c) 1994
 .\"	The Regents of the University of California.  All rights reserved.
@@ -32,7 +32,7 @@
 .\"
 .\"     @(#)gomoku.6	8.2 (Berkeley) 8/4/94
 .\"
-.Dd August 4, 1994
+.Dd March 28, 2010
 .Dt GOMOKU 6
 .Os
 .Sh NAME
@@ -42,35 +42,18 @@
 .Nm
 .Op Fl bcdu
 .Op Fl D Ar debugfile
-.Op Ar inputfile
+.Op Ar savefile
 .Sh DESCRIPTION
 .Nm
-is a two player game were the object is to get 5 in a row horizontally,
+is a two player game where the object is to get 5 in a row horizontally,
 vertically or diagonally on a 19 by 19 grid.
 By convention, black always moves first.
-With no arguments,
-.Nm
-will display a playing board and prompt for moves from the user.
-Valid moves are a letter for the column and a number for the row of an empty
-board location.
-Entering ``quit" or ``resign" will end the game.
-You can save the current state of the game by entering ``save" and
-supplying a file name when prompted.
-The optional file
-.Ar inputfile
-can be used to restore a saved game.
 .Pp
 The options are:
 .Bl -tag -width Ds
 .It Fl b
-This option sets background mode.
-Input moves are read from standard input,
-the computer picks a move, and prints it to standard output.
-The first input line should be either ``black" or ``white" to specify whether
-.Nm
-has the first move or not respectively.
-This option was intended for game tournaments where a referee program handles
-the board display and pits one program against another.
+Run in batch mode.
+.Pq See below.
 .It Fl c
 Computer versus computer.
 .Nm
@@ -85,11 +68,53 @@ Print the debug information to
 instead of to the standard output.
 .It Fl u
 User versus user.
+.Pq Play against yourself.
 This is mostly used for testing.
+.It Ar savefile
+Load a previously saved game from
+.Pa savefile .
 .El
-.Sh AUTHOR
+.Pp
+With no arguments,
+.Nm
+starts a fresh user vs. computer game.
+.Pp
+Moves may be entered by selecting the desired board location and
+pressing the space or enter key.
+The cursor may be moved using the arrow keys or
+.Xr vi 1
+motion keys
+.Em hjklyubn .
+These also may be familiar from
+.Xr rogue 6
+and
+.Xr hack 6 .
+.\" Valid moves are a letter for the column and a number for the row
+.\" of an empty board location.
+To quit, type
+.Sq Q ,
+and to save the game, type
+.Sq S
+and supply a file name when prompted.
+.Ss Batch mode
+Batch mode was intended for game tournaments where a referee program
+handles the board display and pits one program against another.
+In this mode,
+.Nm
+reads moves from standard input and writes its responses to standard
+output.
+The first line of input should be either
+.Dq black
+or
+.Dq white
+to specify whether
+.Nm
+has the first move or not respectively.
+.Sh AUTHORS
 .An Ralph Campbell
 .Sh ACKNOWLEDGEMENTS
 The board display routines were based on the
 .Nm goref
 program written by Peter Langston.
+The user interface was based on Eric S. Raymond's interface for
+.Xr bs 6 .

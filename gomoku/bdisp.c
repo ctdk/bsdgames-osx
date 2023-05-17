@@ -1,4 +1,4 @@
-/*	$NetBSD: bdisp.c,v 1.55 2022/05/29 17:01:42 rillig Exp $	*/
+/*	$NetBSD: bdisp.c,v 1.17 2014/03/22 18:58:57 dholland Exp $	*/
 
 /*
  * Copyright (c) 1994
@@ -30,11 +30,9 @@
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
+ *
+ *	@(#)bdisp.c	8.2 (Berkeley) 5/3/95
  */
-
-#include <sys/cdefs.h>
-/*	@(#)bdisp.c	8.2 (Berkeley) 5/3/95	*/
-__RCSID("$NetBSD: bdisp.c,v 1.55 2022/05/29 17:01:42 rillig Exp $");
 
 #include <curses.h>
 #include <string.h>
@@ -46,12 +44,7 @@ __RCSID("$NetBSD: bdisp.c,v 1.55 2022/05/29 17:01:42 rillig Exp $");
 #define	SCRNW		80		/* assume 80 chars for the moment */
 
 static	int	lastline;
-static	const char pcolor[] = "*O.?";
-
-#define	scr_y(by)	(1 + (BSZ - 1) - ((by) - 1))
-#define	scr_x(bx)	(3 + 2 * ((bx) - 1))
-
-#define TRANSCRIPT_COL	(3 + (2 * BSZ - 1) + 3 + 3)
+static	char	pcolor[] = "*O.?";
 
 /*
  * Initialize screen display.
@@ -60,20 +53,22 @@ void
 cursinit(void)
 {
 
-	if (initscr() == NULL)
+	if (!initscr()) {
 		errx(EXIT_FAILURE, "Couldn't initialize screen");
-
-	if (LINES < SCRNH || COLS < SCRNW)
-		errx(EXIT_FAILURE, "Screen too small (need %dx%d)",
+	}
+	if ((LINES < SCRNH) || (COLS < SCRNW)) {
+		errx(EXIT_FAILURE, "Screen too small (need %d%xd)",
 		    SCRNW, SCRNH);
-
-	keypad(stdscr, true);
+	}
+	keypad(stdscr, TRUE);
 	nonl();
 	noecho();
 	cbreak();
-	leaveok(stdscr, false);
+	leaveok(stdscr, FALSE);
 
+#if 0 /* no mouse support in netbsd curses yet */
 	mousemask(BUTTON1_CLICKED, NULL);
+#endif
 }
 
 /*
@@ -83,7 +78,7 @@ void
 cursfini(void)
 {
 
-	move(BSZ + 4, 0);
+	move(BSZ4, 0);
 	clrtoeol();
 	refresh();
 	echo();
@@ -96,21 +91,28 @@ cursfini(void)
 void
 bdisp_init(void)
 {
+	int i, j;
 
-	/* top and bottom borders */
-	for (int col = 1; col <= BSZ; col++) {
-		mvaddch(scr_y(BSZ + 1), scr_x(col), letters[col]);
-		mvaddch(scr_y(0), scr_x(col), letters[col]);
+	/* top border */
+	for (i = 1; i < BSZ1; i++) {
+		move(0, 2 * i + 1);
+		addch(letters[i]);
 	}
-
 	/* left and right edges */
-	for (int row = BSZ; row >= 1; row--) {
-		mvprintw(scr_y(row), 0, "%2d", row);
-		mvprintw(scr_y(row), scr_x(BSZ) + 2, "%d", row);
+	for (j = BSZ1; --j > 0; ) {
+		move(20 - j, 0);
+		printw("%2d ", j);
+		move(20 - j, 2 * BSZ1 + 1);
+		printw("%d ", j);
 	}
-
-	bdwho();
-	mvaddstr(0, TRANSCRIPT_COL, "  #  black  white");
+	/* bottom border */
+	for (i = 1; i < BSZ1; i++) {
+		move(20, 2 * i + 1);
+		addch(letters[i]);
+	}
+	bdwho(0);
+	move(0, 47);
+	addstr("#  black  white");
 	lastline = 0;
 	bdisp();
 }
@@ -119,46 +121,32 @@ bdisp_init(void)
  * Update who is playing whom.
  */
 void
-bdwho(void)
+bdwho(int update)
 {
-	int bw = (int)strlen(plyr[BLACK]);
-	int ww = (int)strlen(plyr[WHITE]);
-	int available = 3 + (1 + scr_x(BSZ) - scr_x(1)) + 3;
-	int fixed = (int)sizeof("BLACK/ (*) vs. WHITE/ (O)") - 1;
-	int total = fixed + bw + ww;
-	int x;
+	int i, j;
 
-	if (total <= available)
-		x = (available - total) / 2;
-	else {
-		int remaining = available - fixed;
-		int half = remaining / 2;
-
-		if (bw <= half)
-			ww = remaining - bw;
-		else if (ww <= half)
-			bw = remaining - ww;
-		else
-			bw = half, ww = remaining - half;
-		x = 0;
+	move(21, 0);
+        printw("                                              ");
+	i = strlen(plyr[BLACK]);
+	j = strlen(plyr[WHITE]);
+	if (i + j <= 20) {
+		move(21, 10 - (i+j)/2);
+		printw("BLACK/%s (*) vs. WHITE/%s (O)",
+		    plyr[BLACK], plyr[WHITE]);
+	} else {
+		move(21, 0);
+		if (i <= 10) {
+			j = 20 - i;
+		} else if (j <= 10) {
+			i = 20 - j;
+		} else {
+			i = j = 10;
+		}
+		printw("BLACK/%.*s (*) vs. WHITE/%.*s (O)",
+		    i, plyr[BLACK], j, plyr[WHITE]);
 	}
-
-	mvhline(BSZ + 2, 0, ' ', available);
-	mvprintw(BSZ + 2, x, "BLACK/%.*s (*) vs. WHITE/%.*s (O)",
-	    bw, plyr[BLACK], ww, plyr[WHITE]);
-}
-
-static bool
-should_highlight(spot_index s)
-{
-
-	if (game.nmoves > 0 && game.moves[game.nmoves - 1] == s)
-		return true;
-	if (game.win_spot != 0)
-		for (int off = 0; off < 5; off++)
-			if (s == game.win_spot + off * dd[game.win_dir])
-				return true;
-	return false;
+	if (update)
+		refresh();
 }
 
 /*
@@ -167,29 +155,23 @@ should_highlight(spot_index s)
 void
 bdisp(void)
 {
+	int i, j, c;
 	struct spotstr *sp;
 
-	for (int row = BSZ + 1; --row > 0; ) {
-		for (int col = 1; col <= BSZ; col++) {
-			sp = &board[PT(col, row)];
-			char c;
+	for (j = BSZ1; --j > 0; ) {
+		for (i = 1; i < BSZ1; i++) {
+			move(BSZ1 - j, 2 * i + 1);
+			sp = &board[i + j * BSZ1];
 			if (debug > 1 && sp->s_occ == EMPTY) {
-				if ((sp->s_flags & IFLAGALL) != 0)
+				if (sp->s_flags & IFLAGALL)
 					c = '+';
-				else if ((sp->s_flags & CFLAGALL) != 0)
+				else if (sp->s_flags & CFLAGALL)
 					c = '-';
 				else
 					c = '.';
 			} else
 				c = pcolor[sp->s_occ];
-
-			move(scr_y(row), scr_x(col));
-			if (should_highlight(PT(col, row))) {
-				attron(A_BOLD);
-				addch(c);
-				attroff(A_BOLD);
-			} else
-				addch(c);
+			addch(c);
 		}
 	}
 	refresh();
@@ -202,21 +184,21 @@ bdisp(void)
 void
 bdump(FILE *fp)
 {
-	int c;
+	int i, j, c;
 	struct spotstr *sp;
 
 	/* top border */
 	fprintf(fp, "   A B C D E F G H J K L M N O P Q R S T\n");
 
-	for (int row = BSZ + 1; --row > 0; ) {
-		fprintf(fp, "%2d ", row);	/* left edge */
-
-		for (int col = 1; col <= BSZ; col++) {
-			sp = &board[PT(col, row)];
+	for (j = BSZ1; --j > 0; ) {
+		/* left edge */
+		fprintf(fp, "%2d ", j);
+		for (i = 1; i < BSZ1; i++) {
+			sp = &board[i + j * BSZ1];
 			if (debug > 1 && sp->s_occ == EMPTY) {
-				if ((sp->s_flags & IFLAGALL) != 0)
+				if (sp->s_flags & IFLAGALL)
 					c = '+';
-				else if ((sp->s_flags & CFLAGALL) != 0)
+				else if (sp->s_flags & CFLAGALL)
 					c = '-';
 				else
 					c = '.';
@@ -225,8 +207,8 @@ bdump(FILE *fp)
 			putc(c, fp);
 			putc(' ', fp);
 		}
-
-		fprintf(fp, "%d\n", row);	/* right edge */
+		/* right edge */
+		fprintf(fp, "%d\n", j);
 	}
 
 	/* bottom border */
@@ -245,7 +227,8 @@ dislog(const char *str)
 		/* move 'em up */
 		lastline = 1;
 	}
-	mvaddnstr(lastline, TRANSCRIPT_COL, str, SCRNW - TRANSCRIPT_COL - 1);
+	move(lastline, TRANSCRIPT_COL);
+	addnstr(str, SCRNW - TRANSCRIPT_COL - 1);
 	clrtoeol();
 	move(lastline + 1, TRANSCRIPT_COL);
 	clrtoeol();
@@ -254,213 +237,223 @@ dislog(const char *str)
 /*
  * Display a question.
  */
+
 void
 ask(const char *str)
 {
-	int len = (int)strlen(str);
+	int len = strlen(str);
 
-	mvaddstr(BSZ + 4, 0, str);
+	move(BSZ4, 0);
+	addstr(str);
 	clrtoeol();
-	move(BSZ + 4, len);
+	move(BSZ4, len);
 	refresh();
 }
 
 int
 get_key(const char *allowed)
 {
+	int ch;
 
-	for (;;) {
-		int ch = getch();
-		if (allowed == NULL || ch == '\0' ||
-		    strchr(allowed, ch) != NULL)
-			return ch;
-		beep();
-		refresh();
+	while (1) {
+		ch = getch();
+		if (allowed != NULL &&
+		    ch != '\0' && strchr(allowed, ch) == NULL) {
+			beep();
+			refresh();
+			continue;
+		}
+		break;
 	}
+	return ch;
 }
 
-bool
-get_line(char *buf, int size, void (*on_change)(const char *))
+int
+get_line(char *buf, int size)
 {
 	char *cp, *end;
 	int c;
 
+	c = 0;
 	cp = buf;
 	end = buf + size - 1;	/* save room for the '\0' */
-	while ((c = getchar()) != EOF && c != '\n' && c != '\r') {
-		if (!interactive && cp < end) {
-			*cp++ = c;
-			continue;
-		}
-		if (!interactive)
-			errx(EXIT_FAILURE, "line too long");
-
-		switch (c) {
-		case 0x0c:	/* ^L */
-			wrefresh(curscr);
-			continue;
-		case 0x15:	/* ^U */
-		case 0x18:	/* ^X */
-			for (; cp > buf; cp--)
-				addstr("\b \b");
-			break;
-		case '\b':
-		case 0x7f:	/* DEL */
-			if (cp == buf)
+	while (cp < end && (c = getchar()) != EOF && c != '\n' && c != '\r') {
+		*cp++ = c;
+		if (interactive) {
+			switch (c) {
+			case 0x0c: /* ^L */
+				wrefresh(curscr);
+				cp--;
 				continue;
-			cp--;
-			addstr("\b \b");
-			break;
-		default:
-			if (cp < end) {
-				*cp++ = c;
+			case 0x15: /* ^U */
+			case 0x18: /* ^X */
+				while (cp > buf) {
+					cp--;
+					addch('\b');
+				}
+				clrtoeol();
+				break;
+			case '\b':
+			case 0x7f: /* DEL */
+				if (cp == buf + 1) {
+					cp--;
+					continue;
+				}
+				cp -= 2;
+				addch('\b');
+				c = ' ';
+				/* FALLTHROUGH */
+			default:
 				addch(c);
-			} else
-				beep();
+			}
+			refresh();
 		}
-		if (on_change != NULL) {
-			*cp = '\0';
-			on_change(buf);
-		}
-		refresh();
 	}
 	*cp = '\0';
-	return c != EOF;
-}
-
-static bool
-get_coord_mouse(int *x, int *y)
-{
-	MEVENT ev;
-
-	if (getmouse(&ev) == OK &&
-	    (ev.bstate & (BUTTON1_RELEASED | BUTTON1_CLICKED)) != 0 &&
-	    ev.y >= scr_y(BSZ) && ev.y <= scr_y(1) &&
-	    ev.x >= scr_x(1) && ev.x <= scr_x(BSZ) &&
-	    (ev.x - scr_x(1)) % (scr_x(2) - scr_x(1)) == 0) {
-		*x = 1 + (ev.x - scr_x(1)) / (scr_x(2) - scr_x(1));
-		*y = 1 + (scr_y(1) - ev.y) / (scr_y(1) - scr_y(2));
-		return true;
-	}
-	return false;
+	return(c != EOF);
 }
 
 /*
- * Ask the user for the coordinate of a move, or return RESIGN or SAVE.
- *
- * Based on Eric S. Raymond's modifications to the battleship (bs) user
- * interface.
+ * Decent (n)curses interface for the game, based on Eric S. Raymond's
+ * modifications to the battleship (bs) user interface.
  */
-spot_index
+int
 get_coord(void)
 {
-	int x = game.user_x, y = game.user_y;
+	static int curx = BSZ / 2;
+	static int cury = BSZ / 2;
+	int ny, nx, ch;
 
-	move(scr_y(y), scr_x(x));
+	BGOTO(cury, curx);
 	refresh();
+	nx = curx;
+	ny = cury;
 	for (;;) {
-		mvprintw(BSZ + 3, 6, "(%c %d) ", letters[x], y);
-		move(scr_y(y), scr_x(x));
+		mvprintw(BSZ3, (BSZ -6)/2, "(%c %d) ", 
+				'A'+ ((curx > 7) ? (curx+1) : curx), cury + 1);
+		BGOTO(cury, curx);
 
-		int ch = getch();
+		ch = getch();
 		switch (ch) {
 		case 'k':
 		case '8':
 		case KEY_UP:
-			y++;
+			nx = curx;
+			ny = cury + 1;
 			break;
 		case 'j':
 		case '2':
 		case KEY_DOWN:
-			y--;
+			nx = curx;
+			ny = BSZ + cury - 1;
 			break;
 		case 'h':
 		case '4':
 		case KEY_LEFT:
-			x--;
+			nx = BSZ + curx - 1;
+			ny = cury;
 			break;
 		case 'l':
 		case '6':
 		case KEY_RIGHT:
-			x++;
+			nx = curx + 1;
+			ny = cury;
 			break;
 		case 'y':
 		case '7':
 		case KEY_A1:
-			x--;
-			y++;
+			nx = BSZ + curx - 1;
+			ny = cury + 1;
 			break;
 		case 'b':
 		case '1':
 		case KEY_C1:
-			x--;
-			y--;
+			nx = BSZ + curx - 1;
+			ny = BSZ + cury - 1;
 			break;
 		case 'u':
 		case '9':
 		case KEY_A3:
-			x++;
-			y++;
+			nx = curx + 1;
+			ny = cury + 1;
 			break;
 		case 'n':
 		case '3':
 		case KEY_C3:
-			x++;
-			y--;
+			nx = curx + 1;
+			ny = BSZ + cury - 1;
 			break;
 		case 'K':
-			y += 5;
+			nx = curx;
+			ny = cury + 5;
 			break;
 		case 'J':
-			y -= 5;
+			nx = curx;
+			ny = BSZ + cury - 5;
 			break;
 		case 'H':
-			x -= 5;
+			nx = BSZ + curx - 5;
+			ny = cury;
 			break;
 		case 'L':
-			x += 5;
+			nx = curx + 5;
+			ny = cury;
 			break;
 		case 'Y':
-			x -= 5;
-			y += 5;
+		        nx = BSZ + curx - 5;
+			ny = cury + 5;
 			break;
 		case 'B':
-			x -= 5;
-			y -= 5;
+			nx = BSZ + curx - 5;
+			ny = BSZ + cury - 5;
 			break;
 		case 'U':
-			x += 5;
-			y += 5;
+			nx = curx + 5;
+			ny = cury + 5;
 			break;
 		case 'N':
-			x += 5;
-			y -= 5;
+			nx = curx + 5;
+			ny = BSZ + cury - 5;
 			break;
-		case 0x0c:	/* ^L */
-			(void)clearok(stdscr, true);
+		case '\f':
+			nx = curx;
+			ny = cury;
+			(void)clearok(stdscr, TRUE);
 			(void)refresh();
 			break;
+#if 0 /* notyet */
 		case KEY_MOUSE:
-			if (get_coord_mouse(&x, &y))
-				goto selected;
-			beep();
-			break;
+		{
+			MEVENT	myevent;
+
+			getmouse(&myevent);
+			if (myevent.y >= 1 && myevent.y <= BSZ1 &&
+			    myevent.x >= 3 && myevent.x <= (2 * BSZ + 1)) {
+				curx = (myevent.x - 3) / 2;
+				cury = BSZ - myevent.y;
+				return PT(curx,cury);
+			} else {
+				beep();
+			}
+		}
+		break;
+#endif /* 0 */
 		case 'Q':
 		case 'q':
 			return RESIGN;
+			break;
 		case 'S':
 		case 's':
 			return SAVE;
+			break;
 		case ' ':
 		case '\r':
-		selected:
-			(void)mvhline(BSZ + 3, 6, ' ', 6);
-			game.user_x = x;
-			game.user_y = y;
-			return PT(x, y);
-		}
-
-		x = 1 + (x + BSZ - 1) % BSZ;
-		y = 1 + (y + BSZ - 1) % BSZ;
+			(void) mvaddstr(BSZ3, (BSZ -6)/2, "      ");
+			return PT(curx+1,cury+1);
+			break;
 	}
+
+	curx = nx % BSZ;
+	cury = ny % BSZ;
+    }
 }
