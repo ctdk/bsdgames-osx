@@ -120,3 +120,25 @@ gomoku, dab, ching, and wtf were from NetBSD.
 --------
 For lack of a better term. The work porting the bsdgames to OS X was done by me,
 Jeremy Bingham <jbingham@gmail.com>.
+
+
+What's new in this fork
+-----------------------
+
+* Gomoku can now be compiled on a mac M1.
+
+* Some other conflicts with mac M1 fixed.
+
+This version can be compiled on Apple Silicon or on Intel CPU
+
+To compile:
+
+    CFLAGS="-std=c11 -Wno-nullability-completeness" bsdmake PREFIX=/usr/local VARDIR=/var/games
+
+To install:
+
+    BINOWN=$USER LIBOWN=$USER MANOWN=$USER SHAREOWN=$USER bsdmake install PREFIX=/usr/local VARDIR=/var/games
+
+Todo:
+
+* fix tutorial of backgammon
