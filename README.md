@@ -142,3 +142,5 @@ To install:
 Todo:
 
 * fix tutorial of backgammon
+
+* test all games
