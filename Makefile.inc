@@ -38,3 +38,28 @@ NXCFLAGS?=	${CFLAGS:N-mtune*:N-mcpu*:N-march*}
 .no.nx .c.nx:
 	${NXCC} ${_${.IMPSRC:T}_FLAGS} ${NXCFLAGS} ${NXLDFLAGS} ${.IMPSRC} \
 	    ${NXLDLIBS} -o ${.TARGET}
+
+
+# ##########
+# from dragonfly Makefile.inc
+
+# These games write to /usr/local/var/games
+.if defined(VARGAMES)
+# BINGRP=		games
+BINGRP=		staff
+BINMODE=	550
+.endif
+
+# Handle libcrypto dependency
+# .if defined(GAMESCRYPTO)
+# LDADD+=		-lprivate_crypto
+# DPADD+=		${LIBCRYPTO}
+# CFLAGS+=	${PRIVATELIB_CFLAGS}
+# LDFLAGS+=	${PRIVATELIB_LDFLAGS}
+# .endif
+
+# Handle libncurses dependency
+.if defined(GAMESCURSES)
+DPADD+=		${LIBNCURSES}
+LDADD+=		-lncurses
+.endif

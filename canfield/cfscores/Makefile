@@ -3,7 +3,7 @@
 
 PROG=	cfscores
 CFLAGS+=-I${.CURDIR}/../canfield
-NOMAN=	noman
+NO_MAN=	noman
 
 .include "../../Makefile.inc"
 .include <bsd.prog.mk>

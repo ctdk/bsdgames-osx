@@ -1543,7 +1543,7 @@ movecard(void)
 }
 
 const char *const basicinstructions[] = {
-	"Here are brief instuctions to the game of Canfield:\n\n",
+	"Here are brief instructions to the game of Canfield:\n\n",
 	"     If you have never played solitaire before, it is recom-\n",
 	"mended  that  you  consult  a solitaire instruction book. In\n",
 	"Canfield, tableau cards may be built on each other  downward\n",
@@ -1630,12 +1630,13 @@ initall(void)
 {
 	int i;
 
-	if (dbfd < 0)
-		return;
 	srandomdev();
 	time(&acctstart);
 	initdeck(deck);
 	uid = getuid();
+
+	if (dbfd < 0)
+		return;
 
 	i = lseek(dbfd, uid * sizeof(struct betinfo), SEEK_SET);
 	if (i < 0) {

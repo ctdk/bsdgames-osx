@@ -3,7 +3,7 @@
 
 PROG=	snscore
 CFLAGS+= -I${.CURDIR}/../snake
-NOMAN=
+NO_MAN=
 
 .include "../../Makefile.inc"
 .include <bsd.prog.mk>
