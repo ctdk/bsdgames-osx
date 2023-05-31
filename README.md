@@ -129,6 +129,8 @@ What's new in this fork
 * Use a recent version of backgammon from dragonfly in order to
   fix the display.
 * Some other conflicts with mac M1 fixed.
+* ming needs groff:
+      brew install groff
 
 This version can be compiled on Apple Silicon or on Intel CPU
 
