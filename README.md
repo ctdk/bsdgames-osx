@@ -126,7 +126,8 @@ What's new in this fork
 -----------------------
 
 * Gomoku can now be compiled on a mac M1.
-
+* Use a recent version of backgammon from dragonfly in order to
+  fix the display.
 * Some other conflicts with mac M1 fixed.
 
 This version can be compiled on Apple Silicon or on Intel CPU
