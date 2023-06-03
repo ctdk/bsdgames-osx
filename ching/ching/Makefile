@@ -13,6 +13,8 @@ FILESGRP= ${BINGRP}
 SHAREGRP= ${BINGRP}
 MANGRP= ${BINGRP}
 
+CFLAGS+=-I${.CURDIR}/../include
+
 beforeinstall:
 .if !exists(${BINDIR})
 	mkdir -p ${BINDIR}

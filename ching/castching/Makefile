@@ -4,4 +4,6 @@ PROG=	castching
 NO_MAN=	# defined
 BINDIR?= ${PREFIX}/bin
 
+CFLAGS+=-I${.CURDIR}/../include
+
 .include <bsd.prog.mk>

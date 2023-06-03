@@ -7,13 +7,15 @@ BINDIR?=	${PREFIX}/bin
 SHAREDIR=	${PREFIX}/share
 MANDIR=		${SHAREDIR}/man/man
 FILESDIR?=	${SHAREDIR}/games
-VARDIR?= 	${PREFIX}/var/games
+# VARDIR?= 	${PREFIX}/var/games
+VARDIR?= 	/var/games/bsdgames
 WARNS?=		6
 
 BINGRP?=	staff
 SHAREGRP?= 	staff
 
 # cribbed from DragonflyBSD build system
+CFLAGS+=	-std=c11 -Wno-nullability-completeness
 
 NXCC?=		${CC}
 NXCFLAGS?=	${CFLAGS:N-mtune*:N-mcpu*:N-march*}
@@ -43,11 +45,10 @@ NXCFLAGS?=	${CFLAGS:N-mtune*:N-mcpu*:N-march*}
 # ##########
 # from dragonfly Makefile.inc
 
-# These games write to /usr/local/var/games
+# These games write to /var/games.bsdgames
 .if defined(VARGAMES)
-# BINGRP=		games
-BINGRP=		staff
-BINMODE=	550
+BINGRP=		games
+BINMODE=	2555
 .endif
 
 # Handle libcrypto dependency

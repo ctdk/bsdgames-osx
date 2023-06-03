@@ -2,6 +2,8 @@
 # $FreeBSD: src/games/Makefile,v 1.16 1999/08/27 23:28:45 peter Exp $
 # $DragonFly: src/games/Makefile,v 1.3 2008/09/02 21:50:17 dillon Exp $
 
+
+
 # XXX missing: chess ching monop [copyright]
 SUBDIR= adventure \
 	arithmetic \
